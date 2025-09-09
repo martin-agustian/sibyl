@@ -6,10 +6,113 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String?
+  email        String   @unique
+  passwordHash String
+  role         Role
+  jurisdiction String?
+  barNumber    String?
+  emailVerif   Boolean  @default(false)
+  accountVerif Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  cases  Case[]  @relation("ClientCases")
+  quotes Quote[] @relation("LawyerQuotes")
+}
+
+model Case {
+  id          String     @id @default(cuid())
+  title       String
+  category    String
+  description String
+  status      CaseStatus @default(OPEN)
+  clientId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  client  User     @relation("ClientCases", fields: [clientId], references: [id])
+  files   File[]
+  quotes  Quote[]
+  payment Payment?
+}
+
+model File {
+  id           String   @id @default(cuid())
+  caseId       String
+  storagePath  String // path di S3 / Supabase
+  originalName String
+  mimeType     String
+  size         Int
+  createdAt    DateTime @default(now())
+
+  // Relations
+  case Case @relation(fields: [caseId], references: [id])
+}
+
+model Quote {
+  id           String      @id @default(cuid())
+  lawyerId     String
+  caseId       String
+  amount       Decimal
+  expectedDays Int
+  note         String?
+  status       QuoteStatus @default(PROPOSED)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  lawyer  User     @relation("LawyerQuotes", fields: [lawyerId], references: [id])
+  case    Case     @relation(fields: [caseId], references: [id])
+  payment Payment?
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  caseId          String        @unique
+  quoteId         String        @unique
+  stripeSessionId String
+  amount          Decimal
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  case  Case  @relation(fields: [caseId], references: [id])
+  quote Quote @relation(fields: [quoteId], references: [id])
+}
+
+enum Role {
+  CLIENT
+  LAWYER
+}
+
+enum CaseStatus {
+  OPEN
+  ENGAGED
+  CLOSED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  PROPOSED
+  ACCEPTED
+  REJECTED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
 }
