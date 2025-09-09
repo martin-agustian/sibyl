@@ -13,6 +13,8 @@ import {
 
 import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
 
+import { signOut } from "next-auth/react";
+
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
   const handleClick2 = (event: any) => {
@@ -83,11 +85,10 @@ const Profile = () => {
         </MenuItem>
         <Box mt={1} py={1} px={2}>
           <Button
-            href="/login"
             variant="outlined"
             color="primary"
-            component={Link}
             fullWidth
+            onClick={() => signOut({ callbackUrl: "/login" })}
           >
             Logout
           </Button>
