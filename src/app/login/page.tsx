@@ -1,12 +1,30 @@
 "use client";
 import Link from "next/link";
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
-// components
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
-import AuthLogin from "../auth/AuthLogin";
+import AuthLogin from "./components/AuthLogin";
 
-const Login2 = () => {
+import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
+
+const Login = () => {
+
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/"
+
+  const handleSubmit = async () => {
+    console.log("submit");
+    const res = await signIn("credentials", {
+      email: "client1@mailinator.com",
+      password: "Passw0rd!",
+      redirect: false, // kita handle manual redirect
+      callbackUrl,
+    })
+
+    console.log(res, "RESS");
+  }
+
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -70,11 +88,11 @@ const Login2 = () => {
                       variant="h6"
                       fontWeight="500"
                     >
-                      New to Modernize?
+                      New to Sibyl?
                     </Typography>
                     <Typography
                       component={Link}
-                      href="/authentication/register"
+                      href="/register"
                       fontWeight="500"
                       sx={{
                         textDecoration: "none",
@@ -85,6 +103,7 @@ const Login2 = () => {
                     </Typography>
                   </Stack>
                 }
+                onSubmit={handleSubmit}
               />
             </Card>
           </Grid>
@@ -93,4 +112,4 @@ const Login2 = () => {
     </PageContainer>
   );
 };
-export default Login2;
+export default Login;

@@ -16,9 +16,10 @@ interface loginType {
   title?: string;
   subtitle?: React.ReactNode;
   subtext?: React.ReactNode;
+  onSubmit: () => Promise<void>;
 }
 
-const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, onSubmit }: loginType) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -39,7 +40,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         >
           Username
         </Typography>
-        <CustomTextField variant="outlined" fullWidth />
+        <CustomTextField variant="outlined" size="small" fullWidth />
       </Box>
       <Box mt="25px">
         <Typography
@@ -51,7 +52,7 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         >
           Password
         </Typography>
-        <CustomTextField type="password" variant="outlined" fullWidth />
+        <CustomTextField type="password" variant="outlined" size="small" fullWidth />
       </Box>
       <Stack
         justifyContent="space-between"
@@ -84,9 +85,8 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => (
         variant="contained"
         size="large"
         fullWidth
-        component={Link}
-        href="/"
         type="submit"
+        onClick={() => onSubmit()}
       >
         Sign In
       </Button>
