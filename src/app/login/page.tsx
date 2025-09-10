@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { loginSchema, LoginSchema, LoginSchemaErrors } from "@/schemas/loginSchema";
+import { loginSchema, LoginSchema } from "@/schemas/loginSchema";
 
 import Link from "next/link";
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
@@ -16,27 +16,24 @@ const Login = () => {
 	const searchParams = useSearchParams();
 	const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const [loginData, setLoginData] = useState<LoginSchema>({
-    email: "",
-    password: ""
+  const { 
+    register: registerLogin, 
+    handleSubmit: handleSubmitLogin, 
+    formState: { errors: loginErrors } 
+  } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange",
   });
-  const [loginErrors, setLoginErrors] = useState<LoginSchemaErrors>();
 
-	const handleSubmit = async () => {
-    const validate = loginSchema.safeParse(loginData);
+	const handleSubmit = async (data: LoginSchema) => {
+    const response = await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+      callbackUrl,
+    });
 
-    if (validate.success) {      
-      await signIn("credentials", {
-      	email: loginData.email,
-      	password: loginData.password,
-      	redirect: false,
-      	callbackUrl,
-      });
-    }
-    else {
-      const { fieldErrors } = z.flattenError(validate.error);
-      setLoginErrors(fieldErrors);
-    }
+    console.log(response, "response");
 	};
 
 	return (
@@ -55,48 +52,70 @@ const Login = () => {
 						opacity: "0.3",
 					},
 				}}>
-				<Grid container spacing={0} justifyContent="center" sx={{ height: "100vh" }}>
+				<Grid container spacing={0} sx={{ height: "100vh", justifyContent: "center" }}>
 					<Grid
 						display="flex"
 						justifyContent="center"
 						alignItems="center"
-						size={{
-							xs: 12,
-							sm: 12,
-							lg: 4,
-							xl: 3,
-						}}>
-						<Card elevation={9} sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}>
-							<Box display="flex" alignItems="center" justifyContent="center">
+						size={{ xs: 12, sm: 12, lg: 4, xl: 3 }}
+          >
+						<Card elevation={9} sx={{ width: "100%", maxWidth: "500px", zIndex: 1, p: 4 }}>
+							<Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
 								<Logo />
 							</Box>
 							<AuthLogin
 								subtext={
-									<Typography variant="subtitle1" textAlign="center" color="textSecondary" mb={1}>
+									<Typography 
+                    variant="subtitle1" 
+                    color="textSecondary"
+                    sx={{
+                      textAlign: "center",
+                      marginBottom: 1,
+                    }}
+                  >
 										Your Social Campaigns
 									</Typography>
 								}
 								subtitle={
-									<Stack direction="row" spacing={0.5} alignItems="center" justifyContent="center" mt={3}>
-										<Typography color="textSecondary" variant="subtitle1" fontWeight="500">
+									<Stack 
+                    sx={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.5,
+                      marginTop: 3,
+                    }}
+                  >
+										<Typography 
+                      variant="subtitle1" 
+                      color="textSecondary" 
+                      sx={{ fontWeight: 500 }}
+                    >
 											New to Sibyl ?
 										</Typography>
 										<Typography
-											component={Link}
 											href="/register"
-											fontWeight="500"
-                      variant="subtitle1"
+											component={Link}
+											variant="subtitle1"
 											sx={{
-												textDecoration: "none",
+                        fontWeight: 500,
+                        textDecoration: "none",
 												color: "primary.main",
 											}}>
 											Create an account
 										</Typography>
 									</Stack>
 								}
+                register={registerLogin}
                 errors={loginErrors}
-                setData={setLoginData}
-								onSubmit={handleSubmit}
+                handleSubmit={handleSubmitLogin}
+                onSubmit={handleSubmit}
 							/>
 						</Card>
 					</Grid>

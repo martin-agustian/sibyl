@@ -1,21 +1,23 @@
-import { Dispatch, ReactNode, SetStateAction } from "react";
+import { ReactNode } from "react";
 
 import Link from "next/link";
 import { Box, Typography, Button, Stack } from "@mui/material";
 import CustomTextField from "@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField";
 
-import { LoginSchema, LoginSchemaErrors } from "@/schemas/loginSchema";
+import { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { LoginSchema } from "@/schemas/loginSchema";
 
 interface loginType {
   title?: string;
   subtitle?: ReactNode;
   subtext?: ReactNode;
-  setData: Dispatch<SetStateAction<LoginSchema>>;
-  onSubmit: () => Promise<void>;
-  errors?: LoginSchemaErrors;
+  register: UseFormRegister<LoginSchema>;
+  errors?: FieldErrors<LoginSchema>;
+  handleSubmit: UseFormHandleSubmit<LoginSchema>;
+  onSubmit: (data: LoginSchema) => Promise<void>;
 }
 
-const AuthLogin = ({ title, subtitle, subtext, setData, onSubmit, errors }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, register, errors, handleSubmit, onSubmit }: loginType) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -25,82 +27,83 @@ const AuthLogin = ({ title, subtitle, subtext, setData, onSubmit, errors }: logi
 
     {subtext}
 
-    <Stack>
-      <Box>
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          component="label"
-          htmlFor="email"
-          mb="5px"
-        >
-          Email
-        </Typography>
-        
-        <CustomTextField 
-          fullWidth variant="outlined" size="small" 
-          onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))} 
-        />
-        
-        {errors?.email && errors.email.length > 0 && (
-          <Typography variant="caption" color="error" mt="5px">
-            {errors.email[0]}
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack>
+        <Box>
+          <Typography
+            htmlFor="email"
+            component="label"
+            variant="subtitle1"
+            sx={{
+              fontWeight: 600,
+              marginBottom: "5px",
+            }}
+          >
+            Email
           </Typography>
-        )}
-      </Box>
-      <Box mt="15px">
-        <Typography
-          variant="subtitle1"
-          fontWeight={600}
-          component="label"
-          htmlFor="password"
-          mb="5px"
-        >
-          Password
-        </Typography>
-        
-        <CustomTextField 
-          fullWidth type="password" variant="outlined" size="small" 
-          onChange={(e) => setData(prev => ({ ...prev, password: e.target.value }))}  
-        />
+          
+          <CustomTextField fullWidth variant="outlined" size="small" {...register("email")} />
+          
+          {errors?.email?.message && (
+            <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
+              {errors.email.message}
+            </Typography>
+          )}
+        </Box>
+        <Box sx={{ marginTop: "15px" }}>
+          <Stack
+            sx={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
+          >            
+            <Typography
+              htmlFor="password"
+              component="label"
+              variant="subtitle1"
+              sx={{
+                fontWeight: 600,
+                marginBottom: "5px",
+              }}
+            >
+              Password
+            </Typography>
 
-        {errors?.password && errors.password.length > 0 && (
-          <Typography variant="caption" color="error" mt="5px">
-            {errors.password[0]}
-          </Typography>
-        )}
-      </Box>
-      <Stack
-        justifyContent="space-between"
-        direction="row"
-        alignItems="center"
-        my={2}
-      >
-        <Typography
-          component={Link}
-          href="/"
-          fontWeight="500"
-          sx={{
-            textDecoration: "none",
-            color: "primary.main",
-          }}
-        >
-          Forgot Password ?
-        </Typography>
+            <Typography 
+              href="/" 
+              component={Link}
+              sx={{
+                color: "primary.main",
+                fontWeight: 500,
+                textDecoration: "none",
+              }}
+            >
+              Forgot Password ?
+            </Typography>
+          </Stack>
+          
+          <CustomTextField fullWidth type="password" variant="outlined" size="small" {...register("password")} />
+
+          {errors?.password?.message && (
+            <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
+              {errors.password.message}
+            </Typography>
+          )}
+        </Box>
       </Stack>
-    </Stack>
-    <Box>
-      <Button
-        fullWidth
-        color="primary"
-        variant="contained"
-        size="medium"
-        type="submit"      
-        onClick={() => onSubmit()}
-      >
-        Sign In
-      </Button>
-    </Box>
+      <Box sx={{ marginTop: "25px" }}>
+        <Button
+          fullWidth
+          color="primary"
+          variant="contained"
+          size="medium"
+          type="submit"
+        >
+          Sign In
+        </Button>
+      </Box>
+    </form>
     {subtitle}
   </>
 );
