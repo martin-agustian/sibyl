@@ -35,7 +35,7 @@ const NewCases = () => {
 		mode: "onChange",
 	});
 
-  const handleSubmitCase = () => {
+  const handleSubmitCase = (data: AddCasesSchema) => {
 
   }
 
@@ -65,16 +65,23 @@ const NewCases = () => {
             <Grid size={{ xs: 12 }}>
               <Label htmlFor="description">Description {getValues("category")}</Label>
               <InputTextArea id="description" placeholder="Enter Description" {...registerCase("description")}  />
+
+              {caseErrors?.description?.message && (
+                <HelperTextError>{caseErrors.description.message}</HelperTextError>
+              )}
             </Grid>
 
             <Grid size={{ xs: 12 }}>
               <Label htmlFor="description">Files {getValues("category")}</Label>
-              <InputFile watch={watchCase} setValue={setValueCase} control={controlCase}></InputFile>
+              <InputFile watch={watchCase} setValue={setValueCase} control={controlCase} />
+
+              {caseErrors?.files?.message && (
+                <HelperTextError>{caseErrors.files.message}</HelperTextError>
+              )}
             </Grid>
           </Grid>
           <Box sx={{ marginTop: "25px" }}>
             <Button
-              fullWidth
               type="submit"
               color="primary"
               variant="contained"
@@ -82,7 +89,8 @@ const NewCases = () => {
               loading={loadingSubmit}
               sx={{
                 fontWeight: "bold",
-                textTransform: "uppercase"
+                textTransform: "uppercase",
+                minWidth: 120,
               }}
             >
               Submit
