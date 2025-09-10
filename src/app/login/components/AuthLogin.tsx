@@ -13,11 +13,12 @@ interface loginType {
   subtext?: ReactNode;
   register: UseFormRegister<LoginSchema>;
   errors?: FieldErrors<LoginSchema>;
+  loadingSubmit: boolean;
   handleSubmit: UseFormHandleSubmit<LoginSchema>;
-  onSubmit: (data: LoginSchema) => Promise<void>;
+  onSubmit: (data: LoginSchema) => Promise<void>;  
 }
 
-const AuthLogin = ({ title, subtitle, subtext, register, errors, handleSubmit, onSubmit }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, register, errors, loadingSubmit, handleSubmit, onSubmit }: loginType) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -57,7 +58,7 @@ const AuthLogin = ({ title, subtitle, subtext, register, errors, handleSubmit, o
               alignItems: "center",
               justifyContent: "space-between"
             }}
-          >            
+          >
             <Typography
               htmlFor="password"
               component="label"
@@ -83,7 +84,13 @@ const AuthLogin = ({ title, subtitle, subtext, register, errors, handleSubmit, o
             </Typography>
           </Stack>
           
-          <CustomTextField fullWidth type="password" variant="outlined" size="small" {...register("password")} />
+          <CustomTextField 
+            fullWidth 
+            type="password" 
+            variant="outlined" 
+            size="small"
+            {...register("password")} 
+          />
 
           {errors?.password?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
@@ -95,10 +102,15 @@ const AuthLogin = ({ title, subtitle, subtext, register, errors, handleSubmit, o
       <Box sx={{ marginTop: "25px" }}>
         <Button
           fullWidth
+          type="submit"
           color="primary"
           variant="contained"
           size="medium"
-          type="submit"
+          loading={loadingSubmit}
+          sx={{
+            fontWeight: "bold",
+            textTransform: "uppercase"
+          }}
         >
           Sign In
         </Button>

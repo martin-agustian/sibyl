@@ -6,22 +6,24 @@ export async function middleware(req: NextRequest) {
 
 	const token = await getToken({ req });
 
-	if (token) {
-		if (pathname.startsWith("/login")) {
-			return NextResponse.redirect(new URL("/dashboard", req.url));
+	if (!pathname.startsWith("/api")) {
+		if (token) { // has token
+			if (pathname.startsWith("/login")) {
+				return NextResponse.redirect(new URL("/", req.url));
+			}
+	
+			if (pathname.startsWith("/client") && token.role !== "CLIENT") {
+				return NextResponse.redirect(new URL("/unauthorized", req.url));
+			}
+	
+			if (pathname.startsWith("/lawyer") && token.role !== "LAWYER") {
+				return NextResponse.redirect(new URL("/unauthorized", req.url));
+			}
 		}
-
-		if (pathname.startsWith("/client") && token.role !== "CLIENT") {
-			return NextResponse.redirect(new URL("/unauthorized", req.url));
-		}
-
-		if (pathname.startsWith("/lawyer") && token.role !== "LAWYER") {
-			return NextResponse.redirect(new URL("/unauthorized", req.url));
-		}
-	}
-	else {
-		if (!pathname.startsWith("/login")) {
-			return NextResponse.redirect(new URL("/login", req.url));
+		else { // has no token
+			if (!pathname.startsWith("/login")) {
+				return NextResponse.redirect(new URL("/login", req.url));
+			}
 		}
 	}
 

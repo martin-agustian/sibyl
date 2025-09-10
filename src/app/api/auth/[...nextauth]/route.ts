@@ -20,11 +20,10 @@ const handler = NextAuth({
 				const user = await prisma.user.findUnique({
 					where: { email: credentials.email },
 				});
-
-				if (!user) return null;
+				if (!user) throw new Error("Email not found!");
 
 				const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-				if (!isValid) return null;
+				if (!isValid) throw new Error("Wrong password!");
 
 				return {
 					id: user.id,
