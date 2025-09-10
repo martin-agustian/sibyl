@@ -1,25 +1,21 @@
-import React from "react";
-import {
-  Box,
-  Typography,
-  FormGroup,
-  FormControlLabel,
-  Button,
-  Stack,
-  Checkbox,
-} from "@mui/material";
-import Link from "next/link";
+import { Dispatch, ReactNode, SetStateAction } from "react";
 
+import Link from "next/link";
+import { Box, Typography, Button, Stack } from "@mui/material";
 import CustomTextField from "@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField";
+
+import { LoginSchema, LoginSchemaErrors } from "@/schemas/loginSchema";
 
 interface loginType {
   title?: string;
-  subtitle?: React.ReactNode;
-  subtext?: React.ReactNode;
+  subtitle?: ReactNode;
+  subtext?: ReactNode;
+  setData: Dispatch<SetStateAction<LoginSchema>>;
   onSubmit: () => Promise<void>;
+  errors?: LoginSchemaErrors;
 }
 
-const AuthLogin = ({ title, subtitle, subtext, onSubmit }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, setData, onSubmit, errors }: loginType) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -35,14 +31,24 @@ const AuthLogin = ({ title, subtitle, subtext, onSubmit }: loginType) => (
           variant="subtitle1"
           fontWeight={600}
           component="label"
-          htmlFor="username"
+          htmlFor="email"
           mb="5px"
         >
-          Username
+          Email
         </Typography>
-        <CustomTextField variant="outlined" size="small" fullWidth />
+        
+        <CustomTextField 
+          fullWidth variant="outlined" size="small" 
+          onChange={(e) => setData(prev => ({ ...prev, email: e.target.value }))} 
+        />
+        
+        {errors?.email && errors.email.length > 0 && (
+          <Typography variant="caption" color="error" mt="5px">
+            {errors.email[0]}
+          </Typography>
+        )}
       </Box>
-      <Box mt="25px">
+      <Box mt="15px">
         <Typography
           variant="subtitle1"
           fontWeight={600}
@@ -52,7 +58,17 @@ const AuthLogin = ({ title, subtitle, subtext, onSubmit }: loginType) => (
         >
           Password
         </Typography>
-        <CustomTextField type="password" variant="outlined" size="small" fullWidth />
+        
+        <CustomTextField 
+          fullWidth type="password" variant="outlined" size="small" 
+          onChange={(e) => setData(prev => ({ ...prev, password: e.target.value }))}  
+        />
+
+        {errors?.password && errors.password.length > 0 && (
+          <Typography variant="caption" color="error" mt="5px">
+            {errors.password[0]}
+          </Typography>
+        )}
       </Box>
       <Stack
         justifyContent="space-between"
@@ -60,12 +76,6 @@ const AuthLogin = ({ title, subtitle, subtext, onSubmit }: loginType) => (
         alignItems="center"
         my={2}
       >
-        <FormGroup>
-          <FormControlLabel
-            control={<Checkbox defaultChecked />}
-            label="Remeber this Device"
-          />
-        </FormGroup>
         <Typography
           component={Link}
           href="/"
@@ -81,11 +91,11 @@ const AuthLogin = ({ title, subtitle, subtext, onSubmit }: loginType) => (
     </Stack>
     <Box>
       <Button
+        fullWidth
         color="primary"
         variant="contained"
-        size="large"
-        fullWidth
-        type="submit"
+        size="medium"
+        type="submit"      
         onClick={() => onSubmit()}
       >
         Sign In
