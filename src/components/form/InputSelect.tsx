@@ -16,7 +16,11 @@ const InputSelect = ({ defaultValue = "", placeholder, items = [], ...rest }: In
 			displayEmpty
 			renderValue={(selected: any) => {
 				if (!selected) {
-					return <Typography color={theme.palette.text.disabled}>{placeholder}</Typography>;
+					return (
+						<Typography sx={{ fontSize: "0.875rem", color: theme.palette.text.disabled }}>
+							{placeholder}
+						</Typography>
+					);
 				}
 				return items.find((item) => item.value == selected)?.label;
 			}}

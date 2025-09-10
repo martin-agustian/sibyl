@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addCasesSchema, AddCasesSchema } from "@/schemas/cases/addCases";
 
-import { Box, Button, FormControl, Grid, InputLabel } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 
 import PageContainer from "../../components/container/PageContainer";
 import DashboardCard from "../../components/shared/DashboardCard";
@@ -14,6 +14,8 @@ import HelperTextError from "@/components/form/HelperTextError";
 import Label from "@/components/form/Label";
 import InputSelect from "@/components/form/InputSelect";
 import InputText from "@/components/form/InputText";
+import InputTextArea from "@/components/form/InputTextArea";
+import InputFile from "@/components/form/InputFile";
 
 import { lawCategoryOptions } from "@/commons/options";
 
@@ -22,6 +24,9 @@ const NewCases = () => {
 
 	const {
     getValues,
+    watch: watchCase,
+    setValue: setValueCase,
+    control: controlCase,
 		register: registerCase,
 		handleSubmit: onSubmitCase,
 		formState: { errors: caseErrors },
@@ -56,8 +61,16 @@ const NewCases = () => {
                 <HelperTextError>{caseErrors.category.message}</HelperTextError>
               )}
             </Grid>
+            
+            <Grid size={{ xs: 12 }}>
+              <Label htmlFor="description">Description {getValues("category")}</Label>
+              <InputTextArea id="description" placeholder="Enter Description" {...registerCase("description")}  />
+            </Grid>
 
-
+            <Grid size={{ xs: 12 }}>
+              <Label htmlFor="description">Files {getValues("category")}</Label>
+              <InputFile watch={watchCase} setValue={setValueCase} control={controlCase}></InputFile>
+            </Grid>
           </Grid>
           <Box sx={{ marginTop: "25px" }}>
             <Button

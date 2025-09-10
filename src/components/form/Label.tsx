@@ -1,5 +1,5 @@
 import { ComponentProps, ReactNode } from "react";
-import { Typography, TypographyTypeMap } from "@mui/material";
+import { Box, Typography, TypographyTypeMap } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 
 type TypographyComponent = OverridableComponent<TypographyTypeMap<{}, "label">>;
@@ -11,14 +11,16 @@ type LabelProps = TypographyProps & {
 
 const Label = ({ children, sx, ...rest }: LabelProps) => {
   return (
-    <Typography 
-      component="label"
-      variant="subtitle1"
-      sx={{ fontWeight: 600, marginBottom: 5, ...sx }}
-      {...rest}
-    >
-      {children} 
-    </Typography>
+    <Box sx={{ marginBottom: 0.5 }}>
+      <Typography 
+        component="label"
+        variant="subtitle1"
+        sx={{ fontWeight: 600, ...sx }}
+        {...rest}
+      >
+        {children} 
+      </Typography>
+    </Box>
   )
 }
 
