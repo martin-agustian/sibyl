@@ -8,9 +8,8 @@ import { addCasesSchema, AddCasesSchema } from "@/schemas/cases/addCases";
 
 import { Box, Button, Grid } from "@mui/material";
 
-import PageContainer from "../../components/container/PageContainer";
-import DashboardCard from "../../components/shared/DashboardCard";
-
+import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
+import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
 import HelperTextError from "@/components/form/HelperTextError";
 import Label from "@/components/form/Label";
 import InputSelect from "@/components/form/InputSelect";

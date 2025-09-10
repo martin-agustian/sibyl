@@ -74,3 +74,25 @@ export async function POST(req: Request) {
 		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 	}
 }
+
+export async function GET() {
+	try {
+		const session = await getServerSession(authOptions);
+
+		if (!session || session.user.role !== "CLIENT") {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		const cases = await prisma.case.findMany({
+			where: { clientId: session.user.id },
+			include: {
+				_count: { select: { quotes: true } },
+			},
+			orderBy: { createdAt: "desc" },
+		});
+
+		return NextResponse.json({ cases });
+	} catch (error) {
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+	}
+}
