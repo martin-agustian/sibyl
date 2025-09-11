@@ -75,24 +75,44 @@ export async function POST(req: Request) {
 	}
 }
 
-export async function GET() {
-	try {
-		const session = await getServerSession(authOptions);
-
-		if (!session || session.user.role !== "CLIENT") {
-			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-		}
-
-		const cases = await prisma.case.findMany({
-			where: { clientId: session.user.id },
-			include: {
-				_count: { select: { quotes: true } },
-			},
-			orderBy: { createdAt: "desc" },
-		});
-
-		return NextResponse.json({ cases });
-	} catch (error) {
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+export async function GET(req: Request) {
+	const session = await getServerSession(authOptions);
+	if (!session || session.user.role !== "CLIENT") {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
+
+	const { searchParams } = new URL(req.url);
+	const page = parseInt(searchParams.get("page") || "1", 10);
+	const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
+	const title = searchParams.get("title") || "";
+	const category = searchParams.get("category") || "";
+	const status = searchParams.getAll("status").filter((v) => v) || "";
+	const sortBy = searchParams.get("sort") || "";
+
+	const where: any = { clientId: session.user.id };
+	if (title) where.title = { contains: title, mode: "insensitive" };
+	if (status.length > 0) where.status = { in: status };
+	if (category) where.category = category;
+
+	let orderBy: any = { createdAt: "desc" };
+	if (sortBy === "oldest") orderBy = { createdAt: "asc" };
+
+	const [cases, total] = await Promise.all([
+		prisma.case.findMany({
+			where,
+			include: { _count: { select: { quotes: true } } },
+			orderBy,
+			skip: (page - 1) * pageSize,
+			take: pageSize,
+		}),
+		prisma.case.count({ where }),
+	]);
+
+	return NextResponse.json({
+		cases,
+		total,
+		page,
+		pageSize,
+		totalPages: Math.ceil(total / pageSize),
+	});
 }

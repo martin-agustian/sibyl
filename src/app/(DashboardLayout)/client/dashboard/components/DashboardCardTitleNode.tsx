@@ -10,16 +10,28 @@ import Label from "@/components/form/Label";
 import InputSelect from "@/components/form/InputSelect";
 
 import { lawCategoryOptions, sortOptions } from "@/commons/options";
+import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+
+export type FilterSchema = {
+  title: string,
+  category: string,
+  status: string[],
+  sortBy: string,
+};
 
 type DashboardCardTitleNodeProps = {
 	title?: string;
 	openFilter: boolean;
 	setOpenFilter: Dispatch<SetStateAction<boolean>>;
 	handleCloseFilter: () => void;
+  registerFilter: UseFormRegister<FilterSchema>;
+  onSubmitFilter: UseFormHandleSubmit<FilterSchema>;
+  handleSubmitFilter: (data: FilterSchema) => void;  
 };
 
 const DashboardCardTitleNode = ({ 
-  title, openFilter, setOpenFilter, handleCloseFilter,
+  title, openFilter, setOpenFilter, handleCloseFilter, 
+  registerFilter, onSubmitFilter, handleSubmitFilter,
 }: DashboardCardTitleNodeProps) => {
 	return (
 		<>
@@ -34,43 +46,45 @@ const DashboardCardTitleNode = ({
 			</Stack>
 
 			<Dialog open={openFilter} onClose={handleCloseFilter}>
-        <DialogTitle>
-          Filter
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={3}>
-            <Grid size={{ xs: 12 }}>
-              <Label htmlFor="title">Title</Label>
-              <InputText id="title" placeholder="Enter Title" />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-							<Label htmlFor="category">Category</Label>
-							<InputSelect id="category" placeholder="Select Category" items={lawCategoryOptions} defaultValue={""} />
-						</Grid>
-
-            <Grid size={{ xs: 12 }}>
-							<Label htmlFor="category">Status</Label>
-              <FormControlLabel label="Open" control={<Checkbox />} />
-              <FormControlLabel label="Engaged" control={<Checkbox />} />
-              <FormControlLabel label="Closed" control={<Checkbox />} />
-              <FormControlLabel label="Cancelled" control={<Checkbox />} />
-						</Grid>
-
-            <Grid size={{ xs: 12 }}>
-							<Label htmlFor="sort">Sort By</Label>
-							<InputSelect id="sort" placeholder="Select Sort By" items={sortOptions} defaultValue={""} />
-						</Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="outlined" onClick={() => setOpenFilter(false)} sx={{ width: 100 }}>
-            Cancel
-          </Button>
-          <Button variant="contained" onClick={() => {}} autoFocus sx={{ width: 100 }}>
+        <form onSubmit={onSubmitFilter(handleSubmitFilter)}>
+          <DialogTitle>
             Filter
-          </Button>
-        </DialogActions>
+          </DialogTitle>
+          <DialogContent>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12 }}>
+                <Label htmlFor="title">Title</Label>
+                <InputText id="title" placeholder="Enter Title" {...registerFilter("title")} />
+              </Grid>
+
+              <Grid size={{ xs: 12 }}>
+                <Label htmlFor="category">Category</Label>
+                <InputSelect id="category" placeholder="Select Category" items={lawCategoryOptions} defaultValue={""} {...registerFilter("category")} />
+              </Grid>
+
+              <Grid size={{ xs: 12 }}>
+                <Label htmlFor="category">Status</Label>
+                <FormControlLabel label="Open" control={<Checkbox value="open" {...registerFilter("status")} />} />
+                <FormControlLabel label="Engaged" control={<Checkbox value="engaged" {...registerFilter("status")} />} />
+                <FormControlLabel label="Closed" control={<Checkbox value="closed" {...registerFilter("status")} />} />
+                <FormControlLabel label="Cancelled" control={<Checkbox value="cancelled" {...registerFilter("status")} />} />
+              </Grid>
+
+              <Grid size={{ xs: 12 }}>
+                <Label htmlFor="sort">Sort By</Label>
+                <InputSelect id="sort" placeholder="Select Sort By" items={sortOptions} defaultValue={""} {...registerFilter("sortBy")} />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" type="button" onClick={() => setOpenFilter(false)} sx={{ width: 100 }}>
+              Cancel
+            </Button>
+            <Button variant="contained" type="submit" autoFocus sx={{ width: 100 }}>
+              Filter
+            </Button>
+          </DialogActions>
+        </form>
 			</Dialog>
 		</>
 	);

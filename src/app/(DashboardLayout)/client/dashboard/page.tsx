@@ -1,11 +1,12 @@
 "use client";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 
 import Link from "next/link";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
-import DashboardCardTitleNode from "./components/DashboardCardTitleNode";
+import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";
 
 import { Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
@@ -21,30 +22,61 @@ type CaseItem = {
 
 const Dashboard = () => {
 	const [cases, setCases] = useState<CaseItem[]>([]);
+  const [casesTotal, setCasesTotal] = useState<number>(0);
 
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(1);
 
-  const fetchCases = async () => {
-    const res = await fetch("/api/cases");
-    const data = await res.json();
+  const {
+    watch: watchFilter,
+    getValues: getValueFilter,
+    setValue: setValueFilter,
+    control: controlFilter,
+    register: registerFilter,
+    handleSubmit: onSubmitFilter,
+  } = useForm<FilterSchema>({
+    defaultValues: {
+      title: "",
+      category: "",
+      status: [],
+      sortBy: "",
+    },
+  });
+
+  const fetchCases = async (filter?: FilterSchema) => {
+    const query = new URLSearchParams({
+			title: filter?.title || "",
+      category: filter?.category || "",
+			status: filter?.status.toString() || "",
+      sort: filter?.sortBy || "",
+      page: (page + 1).toString(),
+			pageSize: rowsPerPage.toString(),
+		});
+
+    const response = await fetch(`/api/cases?${query.toString()}`);
+    const data = await response.json();
     setCases(data.cases || []);
+    setCasesTotal(data.total);
   };
 
 	useEffect(() => {
 		fetchCases();
-	}, []);
+	}, [page]);
 
-  //  const handleChangePage = (event: MouseEvent, newPage: number) => {
-  //   setPage(newPage);
-  // };
+   const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
 
-  // const handleChangeRowsPerPage = (event:) => {
-  //   setRowsPerPage(parseInt(event.target.value, 10));
-  //   setPage(0); // Reset ke halaman pertama
-  // };
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSubmitFilter = (data: FilterSchema) => {
+    setPage(0);
+  }
 
 	return (
 		<PageContainer title="My Cases" description="Add new case">
@@ -55,6 +87,9 @@ const Dashboard = () => {
             openFilter={openFilter}
             setOpenFilter={setOpenFilter}
             handleCloseFilter={() => setOpenFilter(false)}
+            registerFilter={registerFilter}
+            onSubmitFilter={onSubmitFilter}
+            handleSubmitFilter={handleSubmitFilter}
           />
         }
         action={
@@ -100,13 +135,13 @@ const Dashboard = () => {
 					</Table>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[1, 2, 25]}
             component="div"
-            count={cases.length}
+            count={casesTotal}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={() => {}}
-            onRowsPerPageChange={() => {}}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
           />
 				</TableContainer>
 			</DashboardCard>

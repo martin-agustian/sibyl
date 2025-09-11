@@ -27,6 +27,7 @@
     "apexcharts": "4.7.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
+    "dayjs": "^1.11.18",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
     "lodash": "^4.17.21",
