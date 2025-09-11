@@ -50,7 +50,7 @@ export async function POST(req: Request) {
 
 			const uploadRes = await new Promise<cloudinary.UploadApiResponse>((resolve, reject) => {
 				cloudinary.v2.uploader
-					.upload_stream({ folder: "cases" }, (error, result) => {
+					.upload_stream({ folder: "cases", type: "authenticated", resource_type: "auto" }, (error, result) => {
 						if (error || !result) return reject(error);
 						resolve(result);
 					})
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 			await prisma.file.create({
 				data: {
 					caseId: newCase.id,
-					storagePath: uploadRes.secure_url,
+					storagePath: uploadRes.public_id,
 					originalName: file.name,
 					mimeType: file.type,
 					size: file.size,

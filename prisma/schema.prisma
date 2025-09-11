@@ -52,7 +52,7 @@ model Case {
 model File {
   id           String   @id @default(cuid())
   caseId       String
-  storagePath  String // path di S3 / Supabase
+  storagePath  String
   originalName String
   mimeType     String
   size         Int
