@@ -4,15 +4,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendMail } from "@/lib/mailer";
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: { caseId: string } }) {
 	try {
 		const session = await getServerSession(authOptions);
 		if (!session || session.user.role !== "LAWYER") {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
-
 		const lawyerId = session.user.id;
-		const caseId = params.id;
+		const caseId = params.caseId;
+		
 		const body = await req.json();
 		const { amount, expectedDays, note } = body;
 

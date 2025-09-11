@@ -7,6 +7,7 @@ import Link from "next/link";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
 import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";
+import DialogSummary from "./components/DialogSummary";
 
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
@@ -23,6 +24,9 @@ type CaseItem = {
 const Dashboard = () => {
   const [cases, setCases] = useState<CaseItem[]>([]);
   const [casesTotal, setCasesTotal] = useState<number>(0);
+
+  const [selectedCaseId, setSelectedCaseId] = useState<string>("cmffg3gvo0001u168ptquq99r");
+  const [openDialogSummary, setOpenDialogSummary] = useState<boolean>(true);
 
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
@@ -139,6 +143,12 @@ const Dashboard = () => {
           />
         </TableContainer>
       </DashboardCard>
+
+      <DialogSummary 
+        open={openDialogSummary} 
+        onDialogClose={() => setOpenDialogSummary(false)} 
+        caseId={selectedCaseId}
+      />
     </PageContainer>
   );
 };

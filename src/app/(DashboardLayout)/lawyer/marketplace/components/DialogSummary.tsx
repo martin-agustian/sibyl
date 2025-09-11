@@ -1,0 +1,178 @@
+import Swal from "sweetalert2";
+import dayjs from "dayjs";
+
+import { useEffect, useState } from "react";
+
+import { Box, Button, Dialog, DialogContent, Divider, Grid, Typography } from "@mui/material";
+
+import Label from "@/components/form/Label";
+import InputText from "@/components/form/InputText";
+import HelperTextError from "@/components/form/HelperTextError";
+import InputTextArea from "@/components/form/InputTextArea";
+
+import { CaseModel } from "@/types/model/Case";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuotes";
+
+type DialogSummaryProps = {
+	caseId: string;
+	open: boolean;
+	onDialogClose: () => void;
+};
+
+const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
+	const [caseData, setCaseData] = useState<CaseModel>();
+	const [loadingSubmit, setLoadingSubmit] = useState<boolean>();
+
+	const {
+		watch: watchQuote,
+		getValues: getValueQuote,
+		setValue: setValueQuote,
+		control: controlQuote,
+		register: registerQuote,
+		handleSubmit: onSubmitQuote,
+		formState: { errors: caseQuote },
+	} = useForm<UpsertQuoteSchema>({
+		resolver: zodResolver(upsertQuoteSchema),
+		mode: "onChange",
+	});
+
+	const fetchCase = async () => {
+		try {
+			const response = await fetch(`/api/cases/${caseId}`);
+			const data = await response.json();
+
+			if (response.ok) {
+				setCaseData(data);
+			} else throw new Error(data.error);
+		} catch (error) {
+			await Swal.fire({
+				title: "Error!",
+				icon: "error",
+				text: error instanceof Error ? error.message : (error as string),
+			});
+		}
+	};
+
+	useEffect(() => {
+		fetchCase();
+	}, []);
+
+  const handleSubmitQuote = async (data: UpsertQuoteSchema) => {
+    try {
+			const response = await fetch(`/api/lawyer/marketplace/cases/${caseId}/quotes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: Number(data.amount),
+          expectedDays: Number(data.expectedDays),
+          note: data.note,
+        }),
+      });
+			const responseData = await response.json();
+
+			if (response.ok) {
+				setCaseData(responseData);
+			} else throw new Error(responseData.error);
+		} catch (error) {
+			await Swal.fire({
+				title: "Error!",
+				icon: "error",
+				text: error instanceof Error ? error.message : (error as string),
+			});
+		}
+  };
+
+	return (
+		<Dialog open={open} onClose={onDialogClose}>
+			<DialogContent>
+        <Typography variant="h6" sx={{ color: "primary.main", fontWeight: "bold", marginBottom: 3 }}>
+					Summary
+				</Typography>
+
+				<Grid container spacing={2}>
+					<Grid size={{ xs: 12 }}>
+						<Typography variant="body1">{caseData?.createdAt ? dayjs(caseData.createdAt).format("MMM DD, YYYY") : "-"}</Typography>
+					</Grid>
+
+					<Grid size={{ xs: 12 }}>
+						<Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+							Title
+						</Typography>
+						<Typography variant="body1">{caseData?.title || "-"}</Typography>
+					</Grid>
+
+					<Grid size={{ xs: 12, md: 6 }}>
+						<Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+							Category
+						</Typography>
+						<Typography variant="body1">{caseData?.category || "-"}</Typography>
+					</Grid>
+
+					<Grid size={12}>
+						<Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+							Description
+						</Typography>
+						<Typography variant="body1">{caseData?.description || "-"}</Typography>
+					</Grid>
+				</Grid>
+
+				<Divider sx={{ marginY: 4 }} />
+
+				<Typography variant="h6" sx={{ color: "primary.main", fontWeight: "bold", marginBottom: 3 }}>
+					Submit Quotation
+				</Typography>
+
+				<form onSubmit={onSubmitQuote(handleSubmitQuote)}>
+					<Grid container spacing={3}>
+						<Grid size={{ xs: 12, md: 6 }}>
+							<Label htmlFor="amount">Amount {getValueQuote("amount")}</Label>
+							<InputText id="amount" type="number" placeholder="Enter Amount" {...registerQuote("amount")} />
+
+							{caseQuote?.amount?.message && <HelperTextError>{caseQuote.amount.message}</HelperTextError>}
+						</Grid>
+
+						<Grid size={{ xs: 12, md: 6 }}>
+							<Label htmlFor="expected-days">Expected Days</Label>
+							<InputText id="expected-days" type="number" placeholder="Enter Expected Days" {...registerQuote("expectedDays")} />
+
+							{caseQuote?.expectedDays?.message && <HelperTextError>{caseQuote.expectedDays.message}</HelperTextError>}
+						</Grid>
+
+						<Grid size={{ xs: 12 }}>
+							<Label htmlFor="note">Note</Label>
+							<InputTextArea id="note" placeholder="Enter Note" {...registerQuote("note")} />
+
+							{caseQuote?.note?.message && <HelperTextError>{caseQuote.note.message}</HelperTextError>}
+						</Grid>
+					</Grid>
+					<Box sx={{ marginTop: "25px" }}>
+						<Button
+							type="submit"
+							color="primary"
+							variant="contained"
+							size="medium"
+							loading={loadingSubmit}
+							sx={{
+								fontWeight: "bold",
+								textTransform: "uppercase",
+								minWidth: 120,
+								width: {
+									xs: "100%",
+									md: "auto",
+								},
+							}}>
+							Submit
+						</Button>
+					</Box>
+				</form>
+			</DialogContent>
+		</Dialog>
+	);
+};
+
+export default DialogSummary;
