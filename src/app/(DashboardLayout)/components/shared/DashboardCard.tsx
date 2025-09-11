@@ -1,19 +1,21 @@
-import React from "react";
+import { ReactNode } from "react";
 import { Card, CardContent, Typography, Stack, Box } from "@mui/material";
+import DashboardCardTitle from "./DashboardCardTitle";
 
 type Props = {
 	title?: string;
+	titleNode?: ReactNode;
 	subtitle?: string;
-	action?: React.ReactNode | any;
-	footer?: React.ReactNode;
-	cardheading?: string | React.ReactNode;
-	headtitle?: string | React.ReactNode;
-	headsubtitle?: string | React.ReactNode;
-	children?: React.ReactNode;
-	middlecontent?: string | React.ReactNode;
+	action?: ReactNode | any;
+	footer?: ReactNode;
+	cardheading?: string | ReactNode;
+	headtitle?: string | ReactNode;
+	headsubtitle?: string | ReactNode;
+	children?: ReactNode;
+	middlecontent?: string | ReactNode;
 };
 
-const DashboardCard = ({ title, subtitle, children, action, footer, cardheading, headtitle, headsubtitle, middlecontent }: Props) => {
+const DashboardCard = ({ title, titleNode, subtitle, children, action, footer, cardheading, headtitle, headsubtitle, middlecontent }: Props) => {
 	return (
 		<Card sx={{ padding: 0 }} elevation={9} variant={undefined}>
 			{cardheading ? (
@@ -25,7 +27,7 @@ const DashboardCard = ({ title, subtitle, children, action, footer, cardheading,
 				</CardContent>
 			) : (
 				<CardContent sx={{ p: "30px" }}>
-					{title ? (
+					{title || titleNode ? (
 						<Stack
 							direction="row"
 							spacing={2}
@@ -35,7 +37,8 @@ const DashboardCard = ({ title, subtitle, children, action, footer, cardheading,
 								marginBottom: 3,
 							}}>
 							<Box>
-								{title ? <Typography variant="h5">{title}</Typography> : ""}
+								{title ? <DashboardCardTitle>{title}</DashboardCardTitle> : ""}
+								{titleNode}
 
 								{subtitle ? (
 									<Typography variant="subtitle2" color="textSecondary">

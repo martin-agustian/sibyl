@@ -2,10 +2,12 @@
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 
+import Link from "next/link";
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
+import DashboardCardTitleNode from "./components/DashboardCardTitleNode";
 
-import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
+import { Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
 
 type CaseItem = {
@@ -19,6 +21,8 @@ type CaseItem = {
 
 const Dashboard = () => {
 	const [cases, setCases] = useState<CaseItem[]>([]);
+
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -44,7 +48,21 @@ const Dashboard = () => {
 
 	return (
 		<PageContainer title="My Cases" description="Add new case">
-			<DashboardCard title="My Cases">
+			<DashboardCard 
+        titleNode={
+          <DashboardCardTitleNode 
+            title="My Case"
+            openFilter={openFilter}
+            setOpenFilter={setOpenFilter}
+            handleCloseFilter={() => setOpenFilter(false)}
+          />
+        }
+        action={
+          <Button variant="contained" component={Link} href="/client/cases/new">
+            Add Case
+          </Button>
+        }
+      >
 				<TableContainer component={Paper} elevation={9}>
 					<Table>
 						<TableHead>

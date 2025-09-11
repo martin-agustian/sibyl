@@ -96,28 +96,28 @@ const NewCases = () => {
 				<form onSubmit={onSubmitCase(handleSubmitCase)}>
 					<Grid container spacing={3}>
 						<Grid size={{ xs: 12, md: 6 }}>
-							<Label htmlFor="title">Title {getValueCase("title")}</Label>
+							<Label htmlFor="title">Title</Label>
 							<InputText id="title" placeholder="Enter Title" {...registerCase("title")} />
 
 							{caseErrors?.title?.message && <HelperTextError>{caseErrors.title.message}</HelperTextError>}
 						</Grid>
 
 						<Grid size={{ xs: 12, md: 6 }}>
-							<Label htmlFor="category">Category {getValueCase("category")}</Label>
+							<Label htmlFor="category">Category</Label>
 							<InputSelect id="category" placeholder="Select Category" items={lawCategoryOptions} defaultValue={getValueCase("category")} {...registerCase("category")} />
 
 							{caseErrors?.category?.message && <HelperTextError>{caseErrors.category.message}</HelperTextError>}
 						</Grid>
 
 						<Grid size={{ xs: 12 }}>
-							<Label htmlFor="description">Description {getValueCase("category")}</Label>
+							<Label htmlFor="description">Description</Label>
 							<InputTextArea id="description" placeholder="Enter Description" {...registerCase("description")} />
 
 							{caseErrors?.description?.message && <HelperTextError>{caseErrors.description.message}</HelperTextError>}
 						</Grid>
 
 						<Grid size={{ xs: 12 }}>
-							<Label htmlFor="description">Files {getValueCase("category")}</Label>
+							<Label htmlFor="description">Files</Label>
 							<InputFile watch={watchCase} setValue={setValueCase} control={controlCase} />
 
 							{caseErrors?.files?.message && <HelperTextError>{caseErrors.files.message}</HelperTextError>}
