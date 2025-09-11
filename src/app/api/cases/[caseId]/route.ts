@@ -50,8 +50,23 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 			const myQuote = caseData.quotes.find((q) => q.lawyerId === userId);
 
 			if (myQuote?.status === "ACCEPTED" && caseData.status === "ENGAGED") {
-				// accepted lawyer → bisa lihat case detail + file metadata
-				return NextResponse.json(caseData);
+				// ✅ cek payment status harus "paid"
+				const payment = await prisma.payment.findFirst({
+					where: {
+						caseId: caseData.id,
+						lawyerId: userId,
+						status: "SUCCEEDED",
+					},
+				});
+
+				if (payment) {
+					// lawyer accepted + payment sukses → bisa lihat detail lengkap
+					return NextResponse.json(caseData);
+				} else {
+					// accepted tapi payment belum beres → hide files
+					const { files, ...safeCase } = caseData as any;
+					return NextResponse.json(safeCase);
+				}
 			} else {
 				// lawyer lain → case detail tanpa file
 				const { files, ...safeCase } = caseData;

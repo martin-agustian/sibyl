@@ -1,0 +1,110 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+export async function POST(req: Request, { params }: { params: { id: string } }) {
+	try {
+		const session = await getServerSession(authOptions);
+		if (!session || session.user.role !== "LAWYER") {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		const lawyerId = session.user.id;
+		const caseId = params.id;
+		const body = await req.json();
+		const { amount, expectedDays, note } = body;
+
+		if (!amount || !expectedDays) {
+			return NextResponse.json({ error: "Amount and expectedDays are required" }, { status: 400 });
+		}
+
+		// ✅ Check case masih OPEN
+		const caseData = await prisma.case.findUnique({
+			where: { id: caseId },
+			select: { status: true },
+		});
+
+		if (!caseData || caseData.status !== "OPEN") {
+			return NextResponse.json({ error: "Case not found or not open" }, { status: 400 });
+		}
+
+		// ✅ Cek lawyer sudah submit quote sebelumnya
+		const existingQuote = await prisma.quote.findFirst({
+			where: { caseId, lawyerId },
+		});
+
+		if (existingQuote) {
+			return NextResponse.json({ error: "You already submitted a quote for this case" }, { status: 400 });
+		}
+
+		// ✅ Simpan quote baru
+		const newQuote = await prisma.quote.create({
+			data: {
+				caseId,
+				lawyerId,
+				amount,
+				expectedDays,
+				note: note || "",
+				status: "PROPOSED",
+			},
+		});
+
+		return NextResponse.json({ success: true, quote: newQuote });
+	} catch (error) {
+		console.error("Submit quote error:", error);
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+	}
+}
+
+export async function PATCH(req: Request, { params }: { params: { caseId: string; quoteId: string } }) {
+	try {
+		const session = await getServerSession(authOptions);
+		if (!session || session.user.role !== "LAWYER") {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		const lawyerId = session.user.id;
+		const { caseId, quoteId } = params;
+		const body = await req.json();
+		const { amount, expectedDays, note } = body;
+
+		// ✅ check case masih OPEN
+		const caseData = await prisma.case.findUnique({
+			where: { id: caseId },
+			select: { status: true },
+		});
+
+		if (!caseData || caseData.status !== "OPEN") {
+			return NextResponse.json({ error: "Case not found or not open" }, { status: 400 });
+		}
+
+		// ✅ check quote milik lawyer ini
+		const quote = await prisma.quote.findUnique({
+			where: { id: quoteId },
+		});
+
+		if (!quote || quote.lawyerId !== lawyerId) {
+			return NextResponse.json({ error: "Quote not found or not owned by you" }, { status: 403 });
+		}
+
+		if (quote.status !== "PROPOSED") {
+			return NextResponse.json({ error: "Quote cannot be updated after it is accepted/rejected" }, { status: 400 });
+		}
+
+		// ✅ update quote
+		const updatedQuote = await prisma.quote.update({
+			where: { id: quoteId },
+			data: {
+				amount: amount ?? quote.amount,
+				expectedDays: expectedDays ?? quote.expectedDays,
+				note: note ?? quote.note,
+			},
+		});
+
+		return NextResponse.json({ success: true, quote: updatedQuote });
+	} catch (error) {
+		console.error("Update quote error:", error);
+		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+	}
+}

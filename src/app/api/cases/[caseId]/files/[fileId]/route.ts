@@ -39,12 +39,30 @@ export async function GET(req: Request, { params }: { params: { id: string; file
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
-		} else if (role === "LAWYER") {
+		} 
+		else if (role === "LAWYER") {
 			const myQuote = caseData.quotes.find((q) => q.lawyerId === userId);
 			if (!(myQuote?.status === "ACCEPTED" && caseData.status === "ENGAGED")) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
-		} else {
+
+			// ✅ cek payment harus paid
+			const payment = await prisma.payment.findFirst({
+				where: {
+					caseId: caseData.id,
+					lawyerId: userId,
+					status: "SUCCEEDED",
+				},
+			})
+
+			if (!payment) {
+				return NextResponse.json(
+					{ error: "Payment not completed" },
+					{ status: 403 }
+				)
+			}
+		} 
+		else {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
