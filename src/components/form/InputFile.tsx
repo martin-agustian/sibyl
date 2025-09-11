@@ -79,7 +79,7 @@ const InputFile = ({ control, watch, setValue }: InputFileProps) => {
             display: "grid", gap: 2,
             gridTemplateColumns: {
               xs: '1fr',
-              sm: 'repeat(auto-fill, minmax(100px, 1fr))',
+              sm: 'repeat(auto-fill, minmax(150px, 1fr))',
             },
             marginTop: 2,
           }}
@@ -89,8 +89,8 @@ const InputFile = ({ control, watch, setValue }: InputFileProps) => {
               key={file.name} 
               sx={{ 
                 position: "relative", 
-                width: 150, 
-                height: 150,
+                width: "100%", 
+                maxHeight: 150,
                 border: "1px solid #CCCCCC",  
                 borderRadius: 2, 
                 overflow: "hidden" 

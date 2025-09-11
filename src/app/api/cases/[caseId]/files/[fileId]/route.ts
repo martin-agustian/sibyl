@@ -11,14 +11,14 @@ cloudinary.v2.config({
 	api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function GET(req: Request, { params }: { params: { id: string; fileId: string } }) {
+export async function GET(req: Request, { params }: { params: { caseId: string; fileId: string } }) {
 	try {
 		const session = await getServerSession(authOptions);
 		if (!session) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
-		const { id: caseId, fileId } = params;
+		const { caseId, fileId } = params;
 		const userId = session.user.id;
 		const role = session.user.role;
 

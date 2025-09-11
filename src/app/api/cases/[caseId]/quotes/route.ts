@@ -18,7 +18,6 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 		const page = parseInt(searchParams.get("page") || "1", 10);
 		const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
 		const status = searchParams.get("status") || "";
-		const lawyerName = searchParams.get("lawyerName") || "";
 
 		const caseData = await prisma.case.findUnique({
 			where: { id: caseId },
@@ -46,22 +45,12 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
     if (role === "LAWYER") {
       where.lawyerId = userId;
     }
-    else {
-      if (lawyerName) {
-        where.lawyer = { 
-          name: { 
-            contains: lawyerName, 
-            mode: "insensitive" 
-          } 
-        };
-      }
-    }
 
 		const [quotes, total] = await Promise.all([
 			prisma.quote.findMany({
 				where,
 				include: {
-					lawyer: { select: { id: true, name: true, email: true } },
+					lawyer: { select: { id: true } },
 				},
 				orderBy: { createdAt: "desc" },
 				skip: (page - 1) * pageSize,
