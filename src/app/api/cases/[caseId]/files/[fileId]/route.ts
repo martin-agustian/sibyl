@@ -76,9 +76,23 @@ export async function GET(req: Request, { params }: { params: { caseId: string; 
 			}
 		);
 
-		return NextResponse.json({ url: signedUrl });
+		const cloudinaryRes = await fetch(signedUrl);
+		if (cloudinaryRes.ok) {
+			// Stream file to client with download headers
+			const readable = cloudinaryRes.body;
+
+			return new NextResponse(readable, {
+				status: 200,
+				headers: {
+					"Content-Type": file.mimeType,
+					"Content-Disposition": `attachment; filename="${file.originalName}"`,
+					"Cache-Control": "no-cache",
+				},
+			});
+	 	} else {
+			return NextResponse.json({ error: "Failed to fetch file from Cloudinary" }, { status: 500 });
+		}
 	} catch (error) {
-		console.error("File download error:", error);
 		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
 	}
 }

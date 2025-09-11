@@ -5,6 +5,9 @@ import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request, { params }: { params: { caseId: string } }) {
 	try {
+    const { caseId } = await params;
+		const { searchParams } = new URL(req.url);
+
 		const session = await getServerSession(authOptions);
 		if (!session) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -12,8 +15,6 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 
 		const userId = session.user.id;
 		const role = session.user.role;
-		const { caseId } = params;
-		const { searchParams } = new URL(req.url);
 
 		const page = parseInt(searchParams.get("page") || "1", 10);
 		const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);

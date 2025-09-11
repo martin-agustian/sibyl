@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
+import FilePreview from "@/components/FilePreview";
 
 import { 
   Divider, Grid, Paper, Typography,
@@ -14,7 +15,7 @@ import {
 } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
-import FilePreview from "@/components/FilePreview";
+import { FileModel } from "@/types/model/File";
 
 const CaseDetail = () => {
 	const { caseId } = useParams();
@@ -64,6 +65,33 @@ const CaseDetail = () => {
 		fetchCase();
     fetchQuote();
 	}, []);
+
+  const handleDownloadFile = async (file: FileModel) => {
+    try {
+      if (!file.id) return;
+			const response = await fetch(`/api/cases/${caseId}/files/${file.id}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.originalName || "downloaded-file";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      else {
+        const data = await response.json();
+        throw new Error(data.error);
+      }
+		} 
+    catch (error) {
+			await Swal.fire({
+				title: "Error!",
+				icon: "error",
+				text: error instanceof Error ? error.message : (error as string),
+			});
+		}
+  }
 
 	return (
 		<PageContainer title="Case Detail" description="Add new case">
@@ -122,11 +150,9 @@ const CaseDetail = () => {
               </Typography>
 
               {caseData?.files && caseData.files.length > 0 ? (
-                <FilePreview files={caseData.files} />
+                <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />
               ) : (
-                <Typography variant="body1">
-                  File is Empty
-                </Typography>
+                <Typography variant="body1">-</Typography>
               )}
             </Grid>
 

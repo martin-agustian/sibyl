@@ -1,13 +1,15 @@
 import { Box } from "@mui/system";
-import { Typography } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 
 import { FileModel } from "@/types/model/File";
+import { Download } from "@mui/icons-material";
 
 type FilePreviewProps = {
 	files: FileModel[];
+  onActionClick: (file: FileModel) => void;
 };
 
-const FilePreview = ({ files }: FilePreviewProps) => {
+const FilePreview = ({ files, onActionClick }: FilePreviewProps) => {
 	return (
 		<Box
 			sx={{
@@ -42,7 +44,7 @@ const FilePreview = ({ files }: FilePreviewProps) => {
                     variant="caption"
                     sx={{
                       display: '-webkit-box',
-                      WebkitLineClamp: 4,
+                      WebkitLineClamp: { xs: 1, md: 4 },
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -51,6 +53,20 @@ const FilePreview = ({ files }: FilePreviewProps) => {
                     {file.originalName}
                   </Typography>
               </Box>
+
+              <IconButton
+								size="small"
+								onClick={() => onActionClick(file)}
+								sx={{
+                  position: "absolute",
+									top: 3, 
+                  right: 3,
+									bgcolor: "rgba(255,255,255,0.8)",
+									"&:hover": { bgcolor: "primary.main", color: "white" },
+								}}
+              >
+                <Download fontSize="small" />
+							</IconButton>
           </Box>
         ))}
 		</Box>
