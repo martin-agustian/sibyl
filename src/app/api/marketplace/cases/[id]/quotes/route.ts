@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { sendMail } from "@/lib/mailer";
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
 	try {
@@ -22,7 +23,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 		// ✅ Check case masih OPEN
 		const caseData = await prisma.case.findUnique({
 			where: { id: caseId },
-			select: { status: true },
+      include: { client: true }
 		});
 
 		if (!caseData || caseData.status !== "OPEN") {
@@ -49,6 +50,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 				status: "PROPOSED",
 			},
 		});
+
+    await prisma.notification.create({
+      data: {
+        userId: caseData.clientId,
+        type: "QUOTE",
+        message: `Your case "${caseData.title}" received a new quote.`,
+      },
+    });
+
+    await sendMail(
+      caseData.client.email,
+      "New Quote Received",
+      `<p>Hi ${caseData.client.name},</p>
+      <p>Your case <b>${caseData.title}</b> has received a new quote from a lawyer.</p>`
+    );
 
 		return NextResponse.json({ success: true, quote: newQuote });
 	} catch (error) {

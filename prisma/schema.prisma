@@ -28,8 +28,12 @@ model User {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  cases  Case[]  @relation("ClientCases")
-  quotes Quote[] @relation("LawyerQuotes")
+  cases          Case[]       @relation("ClientCases")
+  lawyerCases    Case[]       @relation("LawyerCases")
+  quotes         Quote[]      @relation("LawyerQuotes")
+  clientPayments Payment[]    @relation("ClientPayment")
+  lawyerPayments Payment[]    @relation("LawyerPayment")
+  notifications  Notification[]
 }
 
 model Case {
@@ -39,12 +43,13 @@ model Case {
   description String
   status      CaseStatus @default(OPEN)
   clientId    String
-  lawyerId    String?    
+  lawyerId    String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   // Relations
   client  User     @relation("ClientCases", fields: [clientId], references: [id])
+  lawyer  User?    @relation("LawyerCases", fields: [lawyerId], references: [id])
   files   File[]
   quotes  Quote[]
   payment Payment?
@@ -94,8 +99,22 @@ model Payment {
   updatedAt       DateTime      @updatedAt
 
   // Relations
-  case  Case  @relation(fields: [caseId], references: [id])
-  quote Quote @relation(fields: [quoteId], references: [id])
+  client User  @relation("ClientPayment", fields: [clientId], references: [id])
+  lawyer User  @relation("LawyerPayment", fields: [lawyerId], references: [id])
+  case   Case  @relation(fields: [caseId], references: [id])
+  quote  Quote @relation(fields: [quoteId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum Role {
@@ -120,4 +139,10 @@ enum PaymentStatus {
   PENDING
   SUCCEEDED
   FAILED
+}
+
+enum NotificationType {
+  QUOTE 
+  CASE 
+  PAYMENT
 }

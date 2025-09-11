@@ -33,6 +33,7 @@
     "lodash": "^4.17.21",
     "next": "^15.1.7",
     "next-auth": "^4.24.11",
+    "nodemailer": "^6.10.1",
     "react": "19.1.0",
     "react-apexcharts": "1.7.0",
     "react-dom": "19.1.0",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/lodash": "4.14.196",
+    "@types/nodemailer": "^7.0.1",
     "@types/react-syntax-highlighter": "^15.5.13",
     "prisma": "^6.15.0"
   }
