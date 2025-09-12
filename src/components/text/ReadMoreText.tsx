@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Typography, Box, BoxProps, Button, SxProps } from "@mui/material";
+import { Box, BoxProps, Button, SxProps } from "@mui/material";
 
 type ReadMoreTextProps = BoxProps & {
 	text: string;
@@ -19,11 +19,11 @@ const ReadMoreText = ({ text, maxChars = 100, sxButton, onClickReadmore, ...rest
   };
 
 	if (!isLongText) {
-		return <Typography>{text}</Typography>;
+		return <Box {...rest} component="span">{text}</Box>;
 	}
 
 	return (
-		<Box {...rest}>
+		<Box {...rest} component="span">
 			{expanded ? text : `${text.slice(0, maxChars)}... `}
 			<Button 
         variant="text" size="small" 

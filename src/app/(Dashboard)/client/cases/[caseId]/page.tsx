@@ -2,7 +2,7 @@
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
-import { useEffect, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
@@ -23,12 +23,14 @@ import {
   DialogTitle,
   DialogActions,
   Stack,
+  Box,
 } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
 import { QuoteModel } from "@/types/model/Quote";
-import { getCaseCategoryLabel } from "@/commons/helper";
+import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
+import DashboardCardTitle from "@/app/(Dashboard)/components/shared/DashboardCardTitle";
 
 const CaseDetail = () => {
 	const { caseId } = useParams();
@@ -40,6 +42,10 @@ const CaseDetail = () => {
 
 	const [caseData, setCaseData] = useState<CaseModel>();
   const [quoteData, setQuoteData] = useState<QuoteModel[]>([]);
+  const [quoteTotal, setQuoteTotal] = useState<number>(0);
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(1);
   
   const [selectedQuoteNote, setSelectedQuoteNote] = useState<string>("");
 
@@ -75,11 +81,17 @@ const CaseDetail = () => {
     try {
       setLoadingQuote(true);
 
-			const response = await fetch(`/api/cases/${caseId}/quotes`);
+      const query = new URLSearchParams({
+        page: (page + 1).toString(),
+        pageSize: rowsPerPage.toString(),
+      });
+
+			const response = await fetch(`/api/cases/${caseId}/quotes?${query.toString()}`);
       const data = await response.json();
 
       if (response.ok) {
         setQuoteData(data.quotes);
+        setQuoteTotal(data.total);
       }
       else throw new Error(data.error);
 
@@ -99,8 +111,11 @@ const CaseDetail = () => {
 	useEffect(() => {    
     handlePaymentStatus();
 		fetchCase();
-    fetchQuote();
 	}, []);
+
+  useEffect(() => {    
+    fetchQuote();
+	}, [page]);
 
   const handlePaymentStatus = async () => {
     if (paymentStatusParams == "success") {
@@ -122,6 +137,15 @@ const CaseDetail = () => {
       handlePaymentStatusConfirm();
     }
   }
+
+  const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handlePaymentStatusConfirm = async () => {
     const url = new URL(window.location.href);
@@ -236,8 +260,6 @@ const CaseDetail = () => {
             </Typography>
           </Grid>
 
-          <Divider />
-
           <Grid size={12}>
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Files
@@ -253,9 +275,11 @@ const CaseDetail = () => {
             )}
           </Grid>
 
-          <Divider />
+          <Divider sx={{ height: "1px", width: "100%", my: 3 }} />
+          
+          <DashboardCardTitle>Quotes</DashboardCardTitle>
 
-          <TableContainer component={Paper} elevation={9}>
+          <TableContainer component={Paper} elevation={9} sx={{ marginTop: 2 }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -278,10 +302,10 @@ const CaseDetail = () => {
                     quoteData.map((c) => (
                       <TableRowData key={c.id} onClick={() => setMenuOpen(true)}>
                         <TableCell sx={{ textTransform: "capitalize" }}>
-                          {c.amount}
+                          {formatNumber(c.amount)}
                         </TableCell>
                         <TableCell>
-                          {c.expectedDays}
+                          {formatNumber(c.expectedDays)}
                         </TableCell>
                         <TableCell>
                           <StatusChip quoteStatus={c.status} />
@@ -307,15 +331,15 @@ const CaseDetail = () => {
               </TableBody>
             </Table>
 
-            {/* <TablePagination
+            <TablePagination
               rowsPerPageOptions={[1, 2, 25]}
               component="div"
-              count={casesTotal}
+              count={quoteTotal}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-            /> */}
+            />
           </TableContainer>
         </Grid>
       </DashboardCard>
