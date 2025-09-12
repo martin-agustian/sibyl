@@ -34,7 +34,10 @@ export async function POST(req: Request) {
           }),
           prisma.quote.updateMany({
             where: { caseId: payment.caseId, id: { not: payment.quoteId } },
-            data: { status: "REJECTED" },
+            data: { 
+              status: "REJECTED", 
+              statusNote: "Thank you for your quote. The client has decided to proceed with another provider" 
+            },
           }),
           prisma.case.update({
             where: { id: payment.caseId },
@@ -46,13 +49,13 @@ export async function POST(req: Request) {
           })
         ]);
 
+        // email success
         await sendMail(
           payment.client.email,
           "Payment Success",
           `<p>Hi ${payment.client.name ?? "User"},</p>
           <p>Your payment for case <b>${payment.case.title}</b> has been confirmed.</p>`
         );
-
         await sendMail(
           payment.lawyer.email,
           "Your Quote Has Been Accepted 🎉",
@@ -60,6 +63,7 @@ export async function POST(req: Request) {
           <p>Your quote for case <b>${payment.case.title}</b> has been accepted by the client. Please wait for payment confirmation.</p>`
         )
 
+        // notif success
         await prisma.notification.createMany({
           data: [
             {
@@ -75,6 +79,26 @@ export async function POST(req: Request) {
           ],
         });
         
+        // notif rejected
+        const rejectedQuotes = await prisma.quote.findMany({
+          where: {
+            caseId: payment.caseId,
+            id: { not: payment.quoteId },
+          },
+          select: {
+            lawyerId: true,
+          },
+        });
+        if (rejectedQuotes.length > 0) {
+          await prisma.notification.createMany({
+            data: rejectedQuotes.map((quote) => ({
+              userId: quote.lawyerId,
+              type: "QUOTE",
+              message: `Your quote for case "${payment.case.title}" was not selected.`,
+            })),
+          });
+        }
+
       }
     }
 

@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { CaseModel } from "./Case";
 
 export type QuoteModel = {
 	id: string;
@@ -10,5 +10,6 @@ export type QuoteModel = {
 	status: string;
 	createdAt: Date;
 	updatedAt: Date;
-	lawyer: User;
+	lawyer: UserModel;
+	case: CaseModel;
 };
