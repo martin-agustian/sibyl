@@ -1,0 +1,3 @@
+type UserModel = {
+	id: string;
+};

@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET!);
 
     // if success
-    if (event.type === "checkout.session.completed") {
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object as Stripe.Checkout.Session;
 
       const payment = await prisma.payment.findFirst({
@@ -26,10 +26,25 @@ export async function POST(req: Request) {
       });
 
       if (payment) {
-        await prisma.payment.update({
-          where: { id: payment.id },
-          data: { status: "SUCCEEDED" },
-        });
+		    // ✅ Update DB: accept quote, reject others, engage case
+        await prisma.$transaction([
+          prisma.quote.update({
+            where: { id: payment.quoteId },
+            data: { status: "ACCEPTED" },
+          }),
+          prisma.quote.updateMany({
+            where: { caseId: payment.caseId, id: { not: payment.quoteId } },
+            data: { status: "REJECTED" },
+          }),
+          prisma.case.update({
+            where: { id: payment.caseId },
+            data: { status: "ENGAGED", lawyerId: payment.lawyerId },
+          }),
+          prisma.payment.update({
+            where: { id: payment.id },
+            data: { status: "SUCCEEDED" },
+          })
+        ]);
 
         await sendMail(
           payment.client.email,

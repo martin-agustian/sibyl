@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
 import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCard";
@@ -11,16 +11,27 @@ import FilePreview from "@/components/FilePreview";
 
 import { 
   Divider, Grid, Paper, Typography,
-  Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, 
+  Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow,
+  Chip,
+  Dialog,
+  DialogContent,
+  Button,
+  DialogTitle,
 } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
+import { QuoteModel } from "@/types/model/Quote";
 
 const CaseDetail = () => {
 	const { caseId } = useParams();
+  const searchParams = useSearchParams();
+  const paymentStatusParams = searchParams.get('payment-status');
 
 	const [caseData, setCaseData] = useState<CaseModel>();
+  const [quoteData, setQuoteData] = useState<QuoteModel[]>([]);
+
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
 	const fetchCase = async () => {
 		try {
@@ -47,8 +58,7 @@ const CaseDetail = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(data, "D");
-        // setCaseData(data);
+        setQuoteData(data.quotes);
       }
       else throw new Error(data.error);
 		} 
@@ -61,10 +71,38 @@ const CaseDetail = () => {
 		}
   };
 
-	useEffect(() => {
+	useEffect(() => {    
+    handlePaymentStatus();
 		fetchCase();
     fetchQuote();
 	}, []);
+
+  const handlePaymentStatus = async () => {
+    if (paymentStatusParams == "success") {
+      await Swal.fire({
+				title: "Success!",
+				icon: "success",
+				text: "Your payment is succeeded",
+			});
+
+      handlePaymentStatusConfirm();
+    }
+    else if (paymentStatusParams == "success") {
+      await Swal.fire({
+				title: "Failed!",
+				icon: "error",
+				text: "Your payment is failed",
+			});
+
+      handlePaymentStatusConfirm();
+    }
+  }
+
+  const handlePaymentStatusConfirm = async () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('payment-status');
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }
 
   const handleDownloadFile = async (file: FileModel) => {
     try {
@@ -83,6 +121,27 @@ const CaseDetail = () => {
         const data = await response.json();
         throw new Error(data.error);
       }
+		} 
+    catch (error) {
+			await Swal.fire({
+				title: "Error!",
+				icon: "error",
+				text: error instanceof Error ? error.message : (error as string),
+			});
+		}
+  }
+
+  const handleAcceptQuote = async () => {
+    try {
+			const response = await fetch(`/api/cases/${caseId}/quotes/cmffsebxl000au1ycwo9y55jd/accept`, {
+        method: "POST",
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        window.location.href = data.checkoutUrl;
+      }
+      else throw new Error(data.error);
 		} 
     catch (error) {
 			await Swal.fire({
@@ -169,29 +228,29 @@ const CaseDetail = () => {
                   <TableCell>Created</TableCell>
                 </TableRow>
               </TableHead>
-              {/* <TableBody>
-                {cases.length === 0 ? (
+              <TableBody>
+                {quoteData.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center">
                       No cases found.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  cases.map((c) => (
-                    <TableRow key={c.id}>
+                  quoteData.map((c) => (
+                    <TableRow key={c.id} onClick={() => setMenuOpen(true)}>
                       <TableCell>
-                        <Typography sx={{ textTransform: "capitalize" }}>{c.title}</Typography>
+                        <Typography sx={{ textTransform: "capitalize" }}>{c.amount}</Typography>
                       </TableCell>
-                      <TableCell>{c.category}</TableCell>
+                      <TableCell>{c.expectedDays}</TableCell>
                       <TableCell>
                         <Chip label={c.status} component="span" size="small" />
                       </TableCell>
-                      <TableCell>{c._count.quotes}</TableCell>
+                      <TableCell>{c.note}</TableCell>
                       <TableCell>{dayjs(c.createdAt).format("MMM DD, YYYY")}</TableCell>
                     </TableRow>
                   ))
                 )}
-              </TableBody> */}
+              </TableBody>
             </Table>
 
             {/* <TablePagination
@@ -206,6 +265,17 @@ const CaseDetail = () => {
           </TableContainer>
         </Grid>
       </DashboardCard>
+
+      <Dialog open={menuOpen} onClose={() => setMenuOpen(false)}>
+        <DialogTitle>
+          Menu
+        </DialogTitle>
+        <DialogContent>
+          <Button variant="outlined" onClick={handleAcceptQuote}>
+            Accept Quote
+          </Button>
+        </DialogContent>
+      </Dialog>
 		</PageContainer>
 	);
 };

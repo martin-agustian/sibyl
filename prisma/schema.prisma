@@ -52,7 +52,7 @@ model Case {
   lawyer  User?    @relation("LawyerCases", fields: [lawyerId], references: [id])
   files   File[]
   quotes  Quote[]
-  payment Payment?
+  payment Payment[]
 }
 
 model File {
@@ -82,13 +82,13 @@ model Quote {
   // Relations
   lawyer  User     @relation("LawyerQuotes", fields: [lawyerId], references: [id])
   case    Case     @relation(fields: [caseId], references: [id])
-  payment Payment?
+  payment Payment[]
 }
 
 model Payment {
   id              String        @id @default(cuid())
-  caseId          String        @unique
-  quoteId         String        @unique
+  caseId          String        
+  quoteId         String        
   clientId        String
   lawyerId        String
   amount          Decimal
