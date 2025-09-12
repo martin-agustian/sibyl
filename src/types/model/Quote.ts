@@ -1,4 +1,5 @@
 import { CaseModel } from "./Case";
+import { QuoteStatus } from "@/commons/type";
 
 export type QuoteModel = {
 	id: string;
@@ -7,7 +8,7 @@ export type QuoteModel = {
 	amount: number;
 	expectedDays: number;
 	note: string;
-	status: string;
+	status: QuoteStatus;
 	createdAt: Date;
 	updatedAt: Date;
 	lawyer: UserModel;

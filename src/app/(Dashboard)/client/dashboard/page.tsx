@@ -10,14 +10,14 @@ import Link from "next/link";
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
 import TableState from "@/components/table/TableState";
+import TableRowData from "@/components/table/TableRowData";
+import StatusChip from "@/components/chip/StatusChip";
 import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";
 
-import { Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
-import { getCaseCategoryLabel, getCaseStatusColor } from "@/commons/helper";
-import TableRowData from "@/components/table/TableRowData";
-import CaseStatusChip from "@/components/chip/CaseStatusChip";
+import { getCaseCategoryLabel } from "@/commons/helper";
 
 const Dashboard = () => {
 	const [cases, setCases] = useState<CaseModel[]>([]);
@@ -155,7 +155,7 @@ const Dashboard = () => {
                         {getCaseCategoryLabel(c.category)}
                       </TableCell>
                       <TableCell>
-                        <CaseStatusChip status={c.status} />
+                        <StatusChip caseStatus={c.status} />
                       </TableCell>
                       <TableCell>
                         {c._count.quotes}

@@ -7,25 +7,28 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
-import CaseStatusChip from "@/components/chip/CaseStatusChip";
 import FilePreview from "@/components/preview/FilePreview";
+import TableRowData from "@/components/table/TableRowData";
+import TableState from "@/components/table/TableState";
+import TableCellNote from "@/components/table/TableCellNote";
+import StatusChip from "@/components/chip/StatusChip";
+import ReadMoreText from "@/components/text/ReadMoreText";
 
 import { 
   Divider, Grid, Paper, Typography,
   Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow,
-  Chip,
   Dialog,
   DialogContent,
   Button,
   DialogTitle,
+  DialogActions,
+  Stack,
 } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
 import { QuoteModel } from "@/types/model/Quote";
 import { getCaseCategoryLabel } from "@/commons/helper";
-import TableRowData from "@/components/table/TableRowData";
-import TableState from "@/components/table/TableState";
 
 const CaseDetail = () => {
 	const { caseId } = useParams();
@@ -37,7 +40,10 @@ const CaseDetail = () => {
 
 	const [caseData, setCaseData] = useState<CaseModel>();
   const [quoteData, setQuoteData] = useState<QuoteModel[]>([]);
+  
+  const [selectedQuoteNote, setSelectedQuoteNote] = useState<string>("");
 
+  const [quoteNoteOpen, setQuoteNoteOpen] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
 
 	const fetchCase = async () => {
@@ -181,7 +187,7 @@ const CaseDetail = () => {
             </Typography>
             <Typography variant="body1" sx={{ marginTop: 0.5 }}>
               {loading ? 'loading...' : (
-                caseData?.status ? <CaseStatusChip status={caseData.status} /> : '-'
+                caseData?.status ? <StatusChip caseStatus={caseData.status} /> : '-'
               )}
             </Typography>
           </Grid>
@@ -190,7 +196,7 @@ const CaseDetail = () => {
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Created At
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ marginTop: 0.5 }}>
               {loading ? 'loading...' : (
                 caseData?.createdAt ? dayjs(caseData.createdAt).format("MMM DD, YYYY - HH:mm"): "-"
               )}
@@ -201,7 +207,7 @@ const CaseDetail = () => {
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Title
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ marginTop: 0.5 }}>
               {loading ? 'loading...' : (
                 caseData?.title || "-"
               )}
@@ -212,7 +218,7 @@ const CaseDetail = () => {
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Category
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ marginTop: 0.5 }}>
               {loading ? 'loading...' : (
                 caseData?.category ? getCaseCategoryLabel(caseData?.category) : "-"
               )}
@@ -223,9 +229,9 @@ const CaseDetail = () => {
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Description
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ marginTop: 0.5 }}>
               {loading ? 'loading...' : (
-                caseData?.description || "-"
+                <ReadMoreText text={caseData?.description || "-"} maxChars={800} />
               )}
             </Typography>
           </Grid>
@@ -256,7 +262,9 @@ const CaseDetail = () => {
                   <TableCell>Amount</TableCell>
                   <TableCell>Expected Days</TableCell>
                   <TableCell>Status</TableCell>
-                  <TableCell>Note</TableCell>
+                  <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                    Note
+                  </TableCell>
                   <TableCell>Created</TableCell>
                 </TableRow>
               </TableHead>
@@ -276,11 +284,19 @@ const CaseDetail = () => {
                           {c.expectedDays}
                         </TableCell>
                         <TableCell>
-                          <Chip label={c.status} component="span" size="small" />
+                          <StatusChip quoteStatus={c.status} />
                         </TableCell>
-                        <TableCell>
-                          {c.note}
-                        </TableCell>
+                        <TableCellNote sx={{ display: { xs: "none", md: "table-cell" } }}>
+                          <ReadMoreText 
+                            text={c.note} 
+                            maxChars={100} 
+                            sxButton={{ fontSize: "0.75rem" }}
+                            onClickReadmore={() => {
+                              setSelectedQuoteNote(c.note);
+                              setQuoteNoteOpen(true);
+                            }} 
+                          />
+                        </TableCellNote>
                         <TableCell>
                           {dayjs(c.createdAt).format("MMM DD, YYYY")}
                         </TableCell>
@@ -304,15 +320,47 @@ const CaseDetail = () => {
         </Grid>
       </DashboardCard>
 
-      <Dialog open={menuOpen} onClose={() => setMenuOpen(false)}>
+      <Dialog fullWidth maxWidth="xs" open={menuOpen} onClose={() => setMenuOpen(false)}>
         <DialogTitle>
           Menu
         </DialogTitle>
         <DialogContent>
-          <Button variant="outlined" onClick={handleAcceptQuote}>
-            Accept Quote
-          </Button>
+          <Stack gap={1}>
+            <Button
+              fullWidth 
+              variant="outlined" 
+              onClick={handleAcceptQuote}
+            >
+              Accept Quote
+            </Button>
+            <Button
+              fullWidth 
+              variant="outlined" 
+              onClick={() => setQuoteNoteOpen(true)}
+              sx={{ display: { xs: "block", md: "none" } }}
+            >
+              See Note
+            </Button>
+          </Stack>
         </DialogContent>
+      </Dialog>
+
+      <Dialog open={quoteNoteOpen} onClose={() => setQuoteNoteOpen(false)}>
+        <DialogTitle>
+          Note
+        </DialogTitle>
+        <DialogContent>
+          {selectedQuoteNote}
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            variant="text" 
+            sx={{ fontWeight: "bold" }}
+            onClick={() => setQuoteNoteOpen(false)}
+          >
+            Close
+          </Button>
+        </DialogActions>
       </Dialog>
 		</PageContainer>
 	);

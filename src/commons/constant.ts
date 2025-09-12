@@ -1,3 +1,4 @@
+import { QuoteStatus } from "@prisma/client";
 import { CaseStatus, MuiColor } from "./type";
 
 export const LAW_CATEGORIES: { label: string; value: string }[] = [
@@ -28,6 +29,21 @@ export const CASE_COLOR_STATUS: { value: CaseStatus; color: MuiColor }[] = [
 	},
 	{
 		value: "CANCELLED",
+		color: "error",
+	},
+];
+
+export const QUOTE_COLOR_STATUS: { value: QuoteStatus; color: MuiColor }[] = [
+	{
+		value: "PROPOSED",
+		color: "info",
+	},
+	{
+		value: "ACCEPTED",
+		color: "success",
+	},
+	{
+		value: "REJECTED",
 		color: "error",
 	},
 ];
