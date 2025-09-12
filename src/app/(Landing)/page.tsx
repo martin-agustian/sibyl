@@ -1,13 +1,15 @@
 import Feature from "./components/Feature";
-import Founder from "./components/Founder";
+import Testimony from "./components/Testimony";
 import Hero from "./components/Hero";
+import Navigation from "./components/Navigation";
 
 const LandingPage = () => {
   return(
     <>
+      <Navigation />
       <Hero />
       <Feature />
-      <Founder />
+      <Testimony />
     </>
   );
 }

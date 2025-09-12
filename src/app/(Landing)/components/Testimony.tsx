@@ -5,7 +5,7 @@ import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 
-const Founder = () => {
+const Testimony = () => {
 	return (
 		<Box id="testimonial" sx={{ py: { xs: 5, md: 8 } }}>
 			<Container>
@@ -36,13 +36,13 @@ const Founder = () => {
 									fontWeight: "inherit",
 									backgroundColor: "unset",
 								}}>
-								Founder{" "}
+								Top Client{" "}
 							</Typography>
 							Say
 						</Typography>
 
              <Typography variant="h5" sx={{ fontStyle: 'italic', borderLeft: '4px solid #ccc', paddingLeft: 2 }}>
-              “Sibyl is a the best app that we build with love and passion, we treat our client as family, we open about critism, we have best team”              
+              “Sibyl is a the best app, build with love and passion, treat us as family and open about critism, they also have best team”              
             </Typography>
 					</Grid>
 				</Grid>
@@ -51,4 +51,4 @@ const Founder = () => {
 	);
 };
 
-export default Founder;
+export default Testimony;
