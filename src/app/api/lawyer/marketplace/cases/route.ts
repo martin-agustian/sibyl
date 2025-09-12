@@ -16,11 +16,15 @@ export async function GET(req: Request) {
 		const title = searchParams.get("title") || "";
 		const category = searchParams.get("category") || "";
 		const createdSince = searchParams.get("createdSince");
+		const sortBy = searchParams.get("sort") || "";
 
 		const where: any = { status: "OPEN" };
 		if (title) where.title = { contains: title, mode: "insensitive" };
 		if (category) where.category = category;
 		if (createdSince) where.createdAt = { gte: new Date(createdSince) };
+
+		let orderBy: any = { createdAt: "desc" };
+		if (sortBy === "oldest") orderBy = { createdAt: "asc" };
 
 		const [cases, total] = await Promise.all([
 			prisma.case.findMany({
@@ -28,7 +32,7 @@ export async function GET(req: Request) {
 				include: {
 					_count: { select: { quotes: true } }, // biar lawyer tahu sudah berapa quote
 				},
-				orderBy: { createdAt: "desc" },
+				orderBy,
 				skip: (page - 1) * pageSize,
 				take: pageSize,
 			}),

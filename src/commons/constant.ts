@@ -1,5 +1,6 @@
 import { QuoteStatus } from "@prisma/client";
 import { CaseStatus, MuiColor } from "./type";
+import { CaseStatusEnum, QuoteStatusEnum } from "./enum";
 
 export const LAW_CATEGORIES: { label: string; value: string }[] = [
 	{ label: "Criminal Law", value: "criminal-law" },
@@ -16,34 +17,34 @@ export const LAW_CATEGORIES: { label: string; value: string }[] = [
 
 export const CASE_COLOR_STATUS: { value: CaseStatus; color: MuiColor }[] = [
 	{
-		value: "OPEN",
+		value: CaseStatusEnum.OPEN,
 		color: "success",
 	},
 	{
-		value: "ENGAGED",
+		value: CaseStatusEnum.ENGAGED,
 		color: "info",
 	},
 	{
-		value: "CLOSED",
+		value: CaseStatusEnum.CLOSED,
 		color: "default",
 	},
 	{
-		value: "CANCELLED",
+		value: CaseStatusEnum.CANCELLED,
 		color: "error",
 	},
 ];
 
 export const QUOTE_COLOR_STATUS: { value: QuoteStatus; color: MuiColor }[] = [
 	{
-		value: "PROPOSED",
+		value: QuoteStatusEnum.PROPOSED,
 		color: "info",
 	},
 	{
-		value: "ACCEPTED",
+		value: QuoteStatusEnum.ACCEPTED,
 		color: "success",
 	},
 	{
-		value: "REJECTED",
+		value: QuoteStatusEnum.REJECTED,
 		color: "error",
 	},
 ];

@@ -11,7 +11,7 @@ import InputDate from "@/components/form/InputDate";
 import InputSelect from "@/components/form/InputSelect";
 
 import { lawCategoryOptions, sortOptions } from "@/commons/options";
-import { Control, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { Control, UseFormHandleSubmit, UseFormRegister, UseFormReset } from "react-hook-form";
 
 export type FilterSchema = {
   title: string,
@@ -27,13 +27,14 @@ type DashboardCardTitleNodeProps = {
 	handleCloseFilter: () => void;
   controlFilter: Control<any>,
   registerFilter: UseFormRegister<FilterSchema>;
+  resetFilter: UseFormReset<FilterSchema>;
   onSubmitFilter: UseFormHandleSubmit<FilterSchema>;
   handleSubmitFilter: (data: FilterSchema) => void;  
 };
 
 const DashboardCardTitleNode = ({
   title, openFilter, setOpenFilter, handleCloseFilter, 
-  controlFilter, registerFilter, onSubmitFilter, handleSubmitFilter,
+  controlFilter, registerFilter, resetFilter, onSubmitFilter, handleSubmitFilter,
 }: DashboardCardTitleNodeProps) => {
 	return (
 		<>
@@ -50,7 +51,12 @@ const DashboardCardTitleNode = ({
 			<Dialog open={openFilter} onClose={handleCloseFilter}>
         <form onSubmit={onSubmitFilter(handleSubmitFilter)}>
           <DialogTitle>
-            Filter
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              Filter
+              <Button variant="text" size="small" onClick={() => resetFilter()}>
+                Reset
+              </Button>
+            </Stack>
           </DialogTitle>
           <DialogContent>
             <Grid container spacing={3}>

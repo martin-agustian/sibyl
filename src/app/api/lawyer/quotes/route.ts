@@ -15,10 +15,35 @@ export async function GET(req: Request) {
 
 		const page = parseInt(searchParams.get("page") || "1", 10);
 		const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
-		const status = searchParams.get("status") || "";
 
-		const where: any = { lawyerId };
-		if (status) where.status = status;
+		const title = searchParams.get("title") || "";
+		const category = searchParams.get("category") || "";
+		const status = searchParams.getAll("status")
+			.flatMap((v) => v.split(','))
+			.filter(Boolean) || [];
+		const sortBy = searchParams.get("sort") || "";
+
+		const where: any = { 
+			lawyerId,
+			...(status.length > 0 && { status: { in: status } }),
+
+			...(title || category ? {
+				case: {
+					...(title && {
+						title: {
+							contains: title,
+							mode: "insensitive",
+						},
+					}),
+					...(category && {
+						category: category,
+					}),
+				},
+			} : {}),
+		};
+
+		let orderBy: any = { createdAt: "desc" };
+		if (sortBy === "oldest") orderBy = { createdAt: "asc" };
 
 		const [quotes, total] = await Promise.all([
 			prisma.quote.findMany({
@@ -34,7 +59,7 @@ export async function GET(req: Request) {
 						},
 					},
 				},
-				orderBy: { createdAt: "desc" },
+				orderBy,
 				skip: (page - 1) * pageSize,
 				take: pageSize,
 			}),

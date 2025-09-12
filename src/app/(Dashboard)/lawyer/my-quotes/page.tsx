@@ -11,12 +11,13 @@ import TableRowData from "@/components/table/TableRowData";
 import TableState from "@/components/table/TableState";
 import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";
 import DialogSummary from "./components/DialogSummary";
+import StatusChip from "@/components/chip/StatusChip";
 
-import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 
 import { QuoteModel } from "@/types/model/Quote";
 import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
-import StatusChip from "@/components/chip/StatusChip";
+import { CaseStatusEnum, QuoteStatusEnum } from "@/commons/enum";
 
 const Dashboard = () => {
   const [quotes, setQuotes] = useState<QuoteModel[]>([]);
@@ -24,13 +25,15 @@ const Dashboard = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [selectedCaseId, setSelectedCaseId] = useState<string>("");
-  const [openDialogSummary, setOpenDialogSummary] = useState<boolean>(false);
-
+  const [selectedQuote, setSelectedQuote] = useState<QuoteModel>();
+  const [openDialogSummary, setOpenSummary] = useState<boolean>(false);
+  const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [openQuoteNote, setOpenQuoteNote] = useState<boolean>(false);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(1);
+  const [filter, setFilter] = useState<FilterSchema>();
 
   const {
     watch: watchFilter,
@@ -38,6 +41,7 @@ const Dashboard = () => {
     setValue: setValueFilter,
     control: controlFilter,
     register: registerFilter,
+    reset: resetFilter,
     handleSubmit: onSubmitFilter,
   } = useForm<FilterSchema>({
     defaultValues: {
@@ -48,7 +52,7 @@ const Dashboard = () => {
     },
   });
 
-  const fetchCases = async (filter?: FilterSchema) => {
+  const fetchCases = async () => {
     try {
       setLoading(true);
 
@@ -87,7 +91,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchCases();
-  }, [page]);
+  }, [filter, page]);
 
    const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -99,6 +103,8 @@ const Dashboard = () => {
   };
 
   const handleSubmitFilter = (data: FilterSchema) => {
+    setOpenFilter(false);
+    setFilter(data);
     setPage(0);
   }
 
@@ -111,7 +117,9 @@ const Dashboard = () => {
             openFilter={openFilter}
             setOpenFilter={setOpenFilter}
             handleCloseFilter={() => setOpenFilter(false)}
+            controlFilter={controlFilter}
             registerFilter={registerFilter}
+            resetFilter={resetFilter}
             onSubmitFilter={onSubmitFilter}
             handleSubmitFilter={handleSubmitFilter}
           />
@@ -137,7 +145,13 @@ const Dashboard = () => {
                   <TableState colSpan={6}>Data not found</TableState>
                 ) : (
                   quotes.map((q) => (
-                    <TableRowData key={q.id}>
+                    <TableRowData 
+                      key={q.id} 
+                      onClick={() => {
+                        setOpenMenu(true); 
+                        setSelectedQuote(q);
+                      }}
+                    >
                       <TableCell sx={{ textTransform: "capitalize" }}>
                         {q.case.title}
                       </TableCell>
@@ -175,11 +189,60 @@ const Dashboard = () => {
         </TableContainer>
       </DashboardCard>
 
-      {/* <DialogSummary 
+      <DialogSummary 
         open={openDialogSummary} 
-        onDialogClose={() => setOpenDialogSummary(false)} 
-        caseId={selectedCaseId}
-      /> */}
+        onDialogClose={() => setOpenSummary(false)} 
+        caseId={selectedQuote?.caseId ?? ""}
+      />
+
+      <Dialog open={openQuoteNote} onClose={() => setOpenQuoteNote(false)}>
+        <DialogTitle>
+          Note
+        </DialogTitle>
+        <DialogContent>
+          {selectedQuote?.note}
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            variant="text" 
+            sx={{ fontWeight: "bold" }}
+            onClick={() => setOpenQuoteNote(false)}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog fullWidth maxWidth="xs" open={openMenu} onClose={() => setOpenMenu(false)}>
+        <DialogTitle>
+          Menu
+        </DialogTitle>
+        <DialogContent>
+          <Stack gap={1.5}>
+            <Button
+              fullWidth 
+              variant="outlined" 
+              onClick={() => setOpenSummary(true)}
+            >
+              Case Summary
+            </Button>
+            <Button
+              fullWidth 
+              variant="outlined" 
+              onClick={() => setOpenQuoteNote(true)}
+            >
+              Open Quote Note
+            </Button>
+            <Button
+              fullWidth 
+              variant="outlined" 
+              // onClick={() => setQuoteNoteOpen(true)}
+            >
+              Open Reject Note
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 };

@@ -1,5 +1,7 @@
 "use client";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import Swal from "sweetalert2";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
@@ -15,6 +17,9 @@ import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCard
 import DialogSummary from "./components/DialogSummary";
 
 import { getCaseCategoryLabel } from "@/commons/helper";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type CaseItem = {
   id: string;
@@ -36,13 +41,15 @@ const Dashboard = () => {
 
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(2);
+  const [filter, setFilter] = useState<FilterSchema>();
 
   const {
     watch: watchFilter,
     getValues: getValueFilter,
     setValue: setValueFilter,
+    reset: resetFilter,
     control: controlFilter,
     register: registerFilter,
     handleSubmit: onSubmitFilter,
@@ -55,17 +62,24 @@ const Dashboard = () => {
     },
   });
 
-  const fetchCases = async (filter?: FilterSchema) => {
+  const fetchCases = async () => {
     try {
       setLoading(true);
 
-      const query = new URLSearchParams({
-        title: filter?.title || "",
-        category: filter?.category || "",
-        sort: filter?.sortBy || "",
-        page: (page + 1).toString(),
-        pageSize: rowsPerPage.toString(),
-      });
+      const query = new URLSearchParams();
+      if (filter?.title) query.set("title", filter.title);
+      if (filter?.category) query.set("category", filter.category);
+      if (filter?.sortBy) query.set("sort", filter.sortBy);
+      // Date (converted to Asia/Singapore ISO string)
+      if (filter?.createdSince) {      
+        const createdSinceISO = dayjs(filter.createdSince)
+          .tz("Asia/Singapore")
+          .toISOString();
+        query.set("createdSince", createdSinceISO);
+      }
+      // Pagination
+      query.set("page", (page + 1).toString());
+      query.set("pageSize", rowsPerPage.toString());
   
       const response = await fetch(`/api/lawyer/marketplace/cases?${query.toString()}`);
       const data = await response.json();
@@ -93,7 +107,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchCases();
-  }, [page]);
+  }, [filter, page]);
 
    const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -105,6 +119,8 @@ const Dashboard = () => {
   };
 
   const handleSubmitFilter = (data: FilterSchema) => {
+    setOpenFilter(false);
+    setFilter(data);
     setPage(0);
   }
 
@@ -119,6 +135,7 @@ const Dashboard = () => {
             handleCloseFilter={() => setOpenFilter(false)}
             controlFilter={controlFilter}
             registerFilter={registerFilter}
+            resetFilter={resetFilter}
             onSubmitFilter={onSubmitFilter}
             handleSubmitFilter={handleSubmitFilter}
           />
