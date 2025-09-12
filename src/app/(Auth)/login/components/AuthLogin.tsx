@@ -44,7 +44,7 @@ const AuthLogin = ({ title, subtitle, subtext, register, errors, loadingSubmit, 
             Email
           </Typography>
           
-          <InputText fullWidth variant="outlined" size="small" placeholder="Enter Email" {...register("email")} />
+          <InputText id="email" fullWidth variant="outlined" size="small" placeholder="Enter Email" {...register("email")} />
           
           {errors?.email?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
@@ -85,7 +85,8 @@ const AuthLogin = ({ title, subtitle, subtext, register, errors, loadingSubmit, 
             </Typography>
           </Stack>
           
-          <InputText 
+          <InputText
+            id="password" 
             fullWidth 
             type="password" 
             variant="outlined" 

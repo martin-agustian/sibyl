@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginSchema } from "@/schemas/auth/loginSchema";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 
@@ -16,9 +16,14 @@ import PageContainer from "@/app/(Dashboard)/components/container/PageContainer"
 import Logo from "@/components/Logo";
 import AuthLogin from "./components/AuthLogin";
 
+import { UserRole } from "@/commons/type";
+
 const Login = () => {
 	const searchParams = useSearchParams();
 	const callbackUrl = searchParams.get("callbackUrl") || "/";
+
+	const { data: session } = useSession();
+	const userRole = session?.user.role as UserRole;
 
 	const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
 
@@ -50,7 +55,9 @@ const Login = () => {
 					showConfirmButton: false,
 				});
 	
-				window.location.href = callbackUrl;
+				window.location.href = 
+					callbackUrl ?? userRole == "CLIENT" ? 
+						"/client/dashboard" : "/lawyer/marketplace";
 			} else {
 				throw new Error(response?.error ?? "");
 			}
@@ -102,7 +109,9 @@ const Login = () => {
 									justifyContent: "center",
 									marginBottom: 2,
 								}}>
-								<Logo />
+								<Link href="/" style={{ textDecoration: "none" }}>
+									<Logo />
+								</Link>
 							</Box>
 							<AuthLogin								
 								subtitle={

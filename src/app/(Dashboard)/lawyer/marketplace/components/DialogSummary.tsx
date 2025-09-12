@@ -16,6 +16,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuotes";
 
+import { getCaseCategoryLabel } from "@/commons/helper";
+import ReadMoreText from "@/components/text/ReadMoreText";
+
 type DialogSummaryProps = {
 	caseId: string;
 	open: boolean;
@@ -24,7 +27,9 @@ type DialogSummaryProps = {
 
 const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 	const [caseData, setCaseData] = useState<CaseModel>();
-	const [loadingSubmit, setLoadingSubmit] = useState<boolean>();
+
+	const [loading, setLoading] = useState<boolean>(true);
+	const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
 
 	const {
 		watch: watchQuote,
@@ -41,13 +46,20 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 
 	const fetchCase = async () => {
 		try {
+			setLoading(true);
+
+			if (!caseId) return;			
 			const response = await fetch(`/api/cases/${caseId}`);
 			const data = await response.json();
 
 			if (response.ok) {
 				setCaseData(data);
 			} else throw new Error(data.error);
+
+			setLoading(false);
 		} catch (error) {
+
+			setLoading(false);
 			await Swal.fire({
 				title: "Error!",
 				icon: "error",
@@ -57,11 +69,13 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 	};
 
 	useEffect(() => {
-		fetchCase();
-	}, []);
+		if (open === true) fetchCase();
+	}, [open]);
 
   const handleSubmitQuote = async (data: UpsertQuoteSchema) => {
     try {
+			setLoadingSubmit(true);
+
 			const response = await fetch(`/api/lawyer/marketplace/cases/${caseId}/quotes`, {
         method: "POST",
         headers: {
@@ -77,8 +91,13 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 
 			if (response.ok) {
 				setCaseData(responseData);
-			} else throw new Error(responseData.error);
+			} 
+			else throw new Error(responseData.error);
+
+			setLoadingSubmit(false);
 		} catch (error) {
+			setLoadingSubmit(false);
+
 			await Swal.fire({
 				title: "Error!",
 				icon: "error",
@@ -96,28 +115,44 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 
 				<Grid container spacing={2}>
 					<Grid size={{ xs: 12 }}>
-						<Typography variant="body1">{caseData?.createdAt ? dayjs(caseData.createdAt).format("MMM DD, YYYY") : "-"}</Typography>
+						<Typography variant="body1">
+							{loading ? 'loading...' : (
+								caseData?.createdAt ? dayjs(caseData.createdAt).format("MMM DD, YYYY") : "-"
+							)}
+						</Typography>
 					</Grid>
 
 					<Grid size={{ xs: 12 }}>
 						<Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
 							Title
 						</Typography>
-						<Typography variant="body1">{caseData?.title || "-"}</Typography>
+						<Typography variant="body1">
+							{loading ? 'loading...' : (
+                caseData?.title || "-"
+              )}
+						</Typography>
 					</Grid>
 
 					<Grid size={{ xs: 12, md: 6 }}>
 						<Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
 							Category
 						</Typography>
-						<Typography variant="body1">{caseData?.category || "-"}</Typography>
+						<Typography variant="body1">
+							{loading ? 'loading...' : (
+								caseData?.category ? getCaseCategoryLabel(caseData?.category) : "-"
+							)}
+						</Typography>
 					</Grid>
 
 					<Grid size={12}>
 						<Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
 							Description
 						</Typography>
-						<Typography variant="body1">{caseData?.description || "-"}</Typography>
+						<Typography variant="body1">
+							{loading ? 'loading...' : (
+                <ReadMoreText text={caseData?.description || "-"} maxChars={500} />
+              )}
+						</Typography>
 					</Grid>
 				</Grid>
 

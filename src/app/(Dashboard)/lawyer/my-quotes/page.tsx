@@ -98,7 +98,7 @@ const Dashboard = () => {
         <TableContainer component={Paper} elevation={9}>
           <Table>
             <TableHead>
-              <TableRow sx={{ borderBottom: "1px solid", borderColor: grey[800] }}>
+              <TableRow>
                 <TableCell>Case Title</TableCell>
                 <TableCell>Case Category</TableCell>
                 <TableCell>Amount</TableCell>
