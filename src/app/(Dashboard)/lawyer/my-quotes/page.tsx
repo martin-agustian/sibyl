@@ -1,24 +1,30 @@
 "use client";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
+
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import Link from "next/link";
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
+import TableRowData from "@/components/table/TableRowData";
+import TableState from "@/components/table/TableState";
 import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";
 import DialogSummary from "./components/DialogSummary";
 
-import { Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import { Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 
 import { QuoteModel } from "@/types/model/Quote";
+import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
+import StatusChip from "@/components/chip/StatusChip";
 
 const Dashboard = () => {
   const [quotes, setQuotes] = useState<QuoteModel[]>([]);
   const [quoteTotal, setQuoteTotal] = useState<number>(0);
 
-  const [selectedCaseId, setSelectedCaseId] = useState<string>("cmffg3gvo0001u168ptquq99r");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [selectedCaseId, setSelectedCaseId] = useState<string>("");
   const [openDialogSummary, setOpenDialogSummary] = useState<boolean>(false);
 
   const [openFilter, setOpenFilter] = useState<boolean>(false);
@@ -43,19 +49,40 @@ const Dashboard = () => {
   });
 
   const fetchCases = async (filter?: FilterSchema) => {
-    const query = new URLSearchParams({
-      title: filter?.title || "",
-      category: filter?.category || "",
-      status: filter?.status.toString() || "",
-      sort: filter?.sortBy || "",
-      page: (page + 1).toString(),
-      pageSize: rowsPerPage.toString(),
-    });
+    try {
+      setLoading(true);
 
-    const response = await fetch(`/api/lawyer/quotes`);
-    const data = await response.json();
-    setQuotes(data.quotes || []);
-    setQuoteTotal(data.total);
+      const query = new URLSearchParams({
+        title: filter?.title || "",
+        category: filter?.category || "",
+        status: filter?.status.toString() || "",
+        sort: filter?.sortBy || "",
+        page: (page + 1).toString(),
+        pageSize: rowsPerPage.toString(),
+      });
+
+      const response = await fetch(`/api/lawyer/quotes?${query.toString()}`);
+      const data = await response.json();
+
+      if (response.ok) {      
+        setQuotes(data.quotes || []);
+        setQuoteTotal(data.total);
+      }
+      else {
+        throw new Error(data.error);
+      }
+
+      setLoading(false);
+    } 
+    catch (error) {
+      setLoading(false);
+
+      await Swal.fire({
+        title: "Error!",
+        icon: "error",
+        text: error instanceof Error ? error.message : (error as string),
+      });
+    }
   };
 
   useEffect(() => {
@@ -89,11 +116,6 @@ const Dashboard = () => {
             handleSubmitFilter={handleSubmitFilter}
           />
         }
-        action={
-          <Button variant="contained" component={Link} href="/client/cases/new">
-            Add Case
-          </Button>
-        }
       >
         <TableContainer component={Paper} elevation={9}>
           <Table>
@@ -108,27 +130,35 @@ const Dashboard = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {quotes.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    No cases found.
-                  </TableCell>
-                </TableRow>
+              {loading ? (
+                <TableState colSpan={6}>Loading...</TableState>
               ) : (
-                quotes.map((q) => (
-                  <TableRow key={q.id}>
-                    <TableCell>
-                      <Typography sx={{ textTransform: "capitalize" }}>{q.case.title}</Typography>
-                    </TableCell>
-                    <TableCell>{q.case.category}</TableCell>
-                    <TableCell>{q.amount}</TableCell>
-                    <TableCell>{q.expectedDays}</TableCell>
-                    <TableCell>
-                      <Chip label={q.status} component="span" size="small" />
-                    </TableCell>
-                    <TableCell>{dayjs(q.createdAt).format("MMM DD, YYYY")}</TableCell>
-                  </TableRow>
-                ))
+                quotes.length === 0 ? (
+                  <TableState colSpan={6}>Data not found</TableState>
+                ) : (
+                  quotes.map((q) => (
+                    <TableRowData key={q.id}>
+                      <TableCell sx={{ textTransform: "capitalize" }}>
+                        {q.case.title}
+                      </TableCell>
+                      <TableCell>
+                        {getCaseCategoryLabel(q.case.category)}
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber(q.amount)}
+                      </TableCell>
+                      <TableCell>
+                        {formatNumber(q.expectedDays)}
+                      </TableCell>
+                      <TableCell>
+                        <StatusChip quoteStatus={q.status} />
+                      </TableCell>
+                      <TableCell>
+                        {dayjs(q.createdAt).format("MMM DD, YYYY")}
+                      </TableCell>
+                    </TableRowData>
+                  ))
+                )
               )}
             </TableBody>
           </Table>
@@ -145,11 +175,11 @@ const Dashboard = () => {
         </TableContainer>
       </DashboardCard>
 
-      <DialogSummary 
+      {/* <DialogSummary 
         open={openDialogSummary} 
         onDialogClose={() => setOpenDialogSummary(false)} 
         caseId={selectedCaseId}
-      />
+      /> */}
     </PageContainer>
   );
 };

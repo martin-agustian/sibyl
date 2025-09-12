@@ -1,13 +1,10 @@
 import { uniqueId } from "lodash";
-import { IconLayoutDashboard } from "@tabler/icons-react";
+import { IconChecklist, IconLayoutDashboard } from "@tabler/icons-react";
 
 import { UserRole } from "@/commons/type";
 
 export const getMenuItems = (role: UserRole) => {
-  const dashboardHref =
-    role === "CLIENT" ? "/client/dashboard" : "/lawyer/marketplace";
-
-  return [
+  const menu = [
     {
       navlabel: true,
       subheader: "HOME",
@@ -16,7 +13,18 @@ export const getMenuItems = (role: UserRole) => {
       id: uniqueId(),
       title: "Dashboard",
       icon: IconLayoutDashboard,
-      href: dashboardHref,
+      href: role === "CLIENT" ? "/client/dashboard" : "/lawyer/marketplace",
     },
   ];
+
+  if (role === "LAWYER") {
+    menu.push({
+      id: uniqueId(),
+      title: "My Quotes",
+      icon: IconChecklist,
+      href: "/lawyer/my-quotes",
+    })
+  }
+
+  return menu;
 };
