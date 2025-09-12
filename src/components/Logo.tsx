@@ -7,7 +7,7 @@ type LogoProps = TypographyProps & {
 const Logo = ({ sxText, ...rest }: LogoProps) => {
 	return (
 		<Typography
-			variant="h1"
+      variant="h1"
 			sx={{
 				position: "relative",
 				color: "primary.main",

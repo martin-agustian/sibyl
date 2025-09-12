@@ -1,10 +1,12 @@
-import React from "react";
-import Menuitems from "./MenuItems";
-import { Box } from "@mui/material";
-import { Logo, Sidebar as MUI_Sidebar, Menu, MenuItem, Submenu } from "react-mui-sidebar";
-import { IconPoint } from "@tabler/icons-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import Link from "next/link";
+import Logo from "@/components/Logo";
+import Menuitems from "./MenuItems";
+
+import { Box } from "@mui/material";
+import { Sidebar as MUI_Sidebar, Menu, MenuItem, Submenu } from "react-mui-sidebar";
+import { IconPoint } from "@tabler/icons-react";
 
 const renderMenuItems = (items: any, pathDirect: any) => {
 	return items.map((item: any) => {
@@ -45,9 +47,9 @@ const SidebarItems = () => {
 	return (
 		<>
 			<MUI_Sidebar width={"100%"} showProfile={false} themeColor={"#5D87FF"} themeSecondaryColor={"#49beff"}>
-				<Logo img="/images/logos/dark-logo.svg" component={Link} to="/">
-					Sibyl
-				</Logo>
+				<Box p={3}>
+					<Logo sxText={{ display: "inline" }} />
+				</Box>
 
 				{renderMenuItems(Menuitems, pathDirect)}
 			</MUI_Sidebar>
