@@ -50,7 +50,7 @@ const Dashboard = () => {
     defaultValues: {
       title: "",
       category: "",
-      status: [],
+      createdSince: null,
       sortBy: "",
     },
   });
@@ -62,7 +62,6 @@ const Dashboard = () => {
       const query = new URLSearchParams({
         title: filter?.title || "",
         category: filter?.category || "",
-        status: filter?.status.toString() || "",
         sort: filter?.sortBy || "",
         page: (page + 1).toString(),
         pageSize: rowsPerPage.toString(),
@@ -118,6 +117,7 @@ const Dashboard = () => {
             openFilter={openFilter}
             setOpenFilter={setOpenFilter}
             handleCloseFilter={() => setOpenFilter(false)}
+            controlFilter={controlFilter}
             registerFilter={registerFilter}
             onSubmitFilter={onSubmitFilter}
             handleSubmitFilter={handleSubmitFilter}
