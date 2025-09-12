@@ -238,10 +238,12 @@ const CaseDetail = () => {
                 ) : (
                   quoteData.map((c) => (
                     <TableRow key={c.id} onClick={() => setMenuOpen(true)}>
-                      <TableCell>
-                        <Typography sx={{ textTransform: "capitalize" }}>{c.amount}</Typography>
+                      <TableCell sx={{ textTransform: "capitalize" }}>
+                        {c.amount}
                       </TableCell>
-                      <TableCell>{c.expectedDays}</TableCell>
+                      <TableCell>
+                        {c.expectedDays}
+                      </TableCell>
                       <TableCell>
                         <Chip label={c.status} component="span" size="small" />
                       </TableCell>
