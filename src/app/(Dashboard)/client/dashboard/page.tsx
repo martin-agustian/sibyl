@@ -110,7 +110,12 @@ const Dashboard = () => {
           />
         }
         action={
-          <Button variant="contained" component={Link} href="/client/cases/new">
+          <Button 
+            variant="contained" 
+            component={Link} 
+            href="/client/cases/new"
+            sx={{ fontWeight: "bold" }}
+          >
             Add Case
           </Button>
         }
@@ -142,7 +147,13 @@ const Dashboard = () => {
                         {getCaseCategoryLabel(c.category)}
                       </TableCell>
                       <TableCell>
-                        <Chip color={getCaseStatusColor(c.status)} label={c.status} component="span" size="small" />
+                        <Chip 
+                          label={c.status} 
+                          color={getCaseStatusColor(c.status)} 
+                          component="span" 
+                          size="small"
+                          sx={{ fontSize: "12px", fontWeight: "bold" }} 
+                        />
                       </TableCell>
                       <TableCell>
                         {c._count.quotes}

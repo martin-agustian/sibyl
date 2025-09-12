@@ -1,74 +1,65 @@
 "use client";
+import { ReactNode, useState } from "react";
+
 import { styled, Container, Box } from "@mui/material";
-import React, { useState } from "react";
+
 import Header from "@/app/(Dashboard)/layout/header/Header";
 import Sidebar from "@/app/(Dashboard)/layout/sidebar/Sidebar";
 
+import { SessionProvider } from "next-auth/react";
 
 const MainWrapper = styled("div")(() => ({
-  display: "flex",
-  minHeight: "100vh",
-  width: "100%",
+	display: "flex",
+	minHeight: "100vh",
+	width: "100%",
 }));
 
 const PageWrapper = styled("div")(() => ({
-  display: "flex",
-  flexGrow: 1,
-  paddingBottom: "60px",
-  flexDirection: "column",
-  zIndex: 1,
-  backgroundColor: "transparent",
+	display: "flex",
+	flexGrow: 1,
+	paddingBottom: "60px",
+	flexDirection: "column",
+	zIndex: 1,
+	backgroundColor: "transparent",
 }));
 
-interface Props {
-  children: React.ReactNode;
-}
+export default function RootLayout({ children }: { children: ReactNode }) {
+	const [isSidebarOpen, setSidebarOpen] = useState(true);
+	const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  return (
-    <MainWrapper className="mainwrapper">
-      {/* ------------------------------------------- */}
-      {/* Sidebar */}
-      {/* ------------------------------------------- */}
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        isMobileSidebarOpen={isMobileSidebarOpen}
-        onSidebarClose={() => setMobileSidebarOpen(false)}
-      />
-      {/* ------------------------------------------- */}
-      {/* Main Wrapper */}
-      {/* ------------------------------------------- */}
-      <PageWrapper className="page-wrapper">
+	return (
+    <SessionProvider>
+      <MainWrapper className="mainwrapper">
         {/* ------------------------------------------- */}
-        {/* Header */}
+        {/* Sidebar */}
         {/* ------------------------------------------- */}
-        <Header toggleMobileSidebar={() => setMobileSidebarOpen(true)} />
+        <Sidebar isSidebarOpen={isSidebarOpen} isMobileSidebarOpen={isMobileSidebarOpen} onSidebarClose={() => setMobileSidebarOpen(false)} />
         {/* ------------------------------------------- */}
-        {/* PageContent */}
+        {/* Main Wrapper */}
         {/* ------------------------------------------- */}
-        <Container
-          sx={{
-            paddingTop: "20px",
-            maxWidth: "1200px",
-          }}
-        >
+        <PageWrapper className="page-wrapper">
           {/* ------------------------------------------- */}
-          {/* Page Route */}
+          {/* Header */}
           {/* ------------------------------------------- */}
-          <Box sx={{ minHeight: "calc(100vh - 170px)" }}>{children}</Box>
+          <Header toggleMobileSidebar={() => setMobileSidebarOpen(true)} />
           {/* ------------------------------------------- */}
-          {/* End Page */}
+          {/* PageContent */}
           {/* ------------------------------------------- */}
-        </Container>
-      </PageWrapper>
-    </MainWrapper>
-  );
+          <Container
+            sx={{
+              paddingTop: "20px",
+              maxWidth: "1200px",
+            }}>
+            {/* ------------------------------------------- */}
+            {/* Page Route */}
+            {/* ------------------------------------------- */}
+            <Box sx={{ minHeight: "calc(100vh - 170px)" }}>{children}</Box>
+            {/* ------------------------------------------- */}
+            {/* End Page */}
+            {/* ------------------------------------------- */}
+          </Container>
+        </PageWrapper>
+      </MainWrapper>
+    </SessionProvider>
+	);
 }

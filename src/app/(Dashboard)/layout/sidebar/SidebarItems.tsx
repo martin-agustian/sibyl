@@ -1,12 +1,16 @@
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import Menuitems from "./MenuItems";
 
 import { Box } from "@mui/material";
 import { Sidebar as MUI_Sidebar, Menu, MenuItem, Submenu } from "react-mui-sidebar";
 import { IconPoint } from "@tabler/icons-react";
+
+import { getMenuItems } from "./MenuItems";
+
+import { UserRole } from "@/commons/type";
 
 const renderMenuItems = (items: any, pathDirect: any) => {
 	return items.map((item: any) => {
@@ -41,6 +45,9 @@ const renderMenuItems = (items: any, pathDirect: any) => {
 };
 
 const SidebarItems = () => {
+	const { data: session } = useSession();
+	const userRole = session?.user.role as UserRole;
+
 	const pathname = usePathname();
 	const pathDirect = pathname;
 
@@ -51,7 +58,7 @@ const SidebarItems = () => {
 					<Logo sxText={{ display: "inline" }} />
 				</Box>
 
-				{renderMenuItems(Menuitems, pathDirect)}
+				{renderMenuItems(getMenuItems(userRole), pathDirect)}
 			</MUI_Sidebar>
 		</>
 	);
