@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import Swal from "sweetalert2";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import Link from "next/link";
@@ -15,6 +16,8 @@ import { Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, Table
 
 import { CaseModel } from "@/types/model/Case";
 import { getCaseCategoryLabel, getCaseStatusColor } from "@/commons/helper";
+import TableRowData from "@/components/table/TableRowData";
+import CaseStatusChip from "@/components/chip/CaseStatusChip";
 
 const Dashboard = () => {
 	const [cases, setCases] = useState<CaseModel[]>([]);
@@ -26,6 +29,8 @@ const Dashboard = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(2);
+  
+  const router = useRouter();
 
   const {
     watch: watchFilter,
@@ -139,7 +144,10 @@ const Dashboard = () => {
                   <TableState colSpan={5}>Data not found</TableState>
                 ) : (
                   cases.map((c) => (
-                    <TableRow key={c.id}>
+                    <TableRowData 
+                      key={c.id} 
+                      onClick={() => { router.push(`/client/cases/${c.id}`) }}
+                    >
                       <TableCell sx={{ textTransform: "capitalize" }}>
                         {c.title}
                       </TableCell>
@@ -147,13 +155,7 @@ const Dashboard = () => {
                         {getCaseCategoryLabel(c.category)}
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                          label={c.status} 
-                          color={getCaseStatusColor(c.status)} 
-                          component="span" 
-                          size="small"
-                          sx={{ fontSize: "12px", fontWeight: "bold" }} 
-                        />
+                        <CaseStatusChip status={c.status} />
                       </TableCell>
                       <TableCell>
                         {c._count.quotes}
@@ -161,7 +163,7 @@ const Dashboard = () => {
                       <TableCell>
                         {dayjs(c.createdAt).format("MMM DD, YYYY")}
                       </TableCell>
-                    </TableRow>
+                    </TableRowData>
                   ))
                 )
               )}

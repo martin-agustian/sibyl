@@ -7,7 +7,8 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
-import FilePreview from "@/components/FilePreview";
+import CaseStatusChip from "@/components/chip/CaseStatusChip";
+import FilePreview from "@/components/preview/FilePreview";
 
 import { 
   Divider, Grid, Paper, Typography,
@@ -22,11 +23,17 @@ import {
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
 import { QuoteModel } from "@/types/model/Quote";
+import { getCaseCategoryLabel } from "@/commons/helper";
+import TableRowData from "@/components/table/TableRowData";
+import TableState from "@/components/table/TableState";
 
 const CaseDetail = () => {
 	const { caseId } = useParams();
   const searchParams = useSearchParams();
   const paymentStatusParams = searchParams.get('payment-status');
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingQuote, setLoadingQuote] = useState<boolean>(true);
 
 	const [caseData, setCaseData] = useState<CaseModel>();
   const [quoteData, setQuoteData] = useState<QuoteModel[]>([]);
@@ -35,6 +42,8 @@ const CaseDetail = () => {
 
 	const fetchCase = async () => {
 		try {
+      setLoading(true);
+
 			const response = await fetch(`/api/cases/${caseId}`);
       const data = await response.json();
 
@@ -42,8 +51,12 @@ const CaseDetail = () => {
         setCaseData(data);
       }
       else throw new Error(data.error);
+
+      setLoading(false);
 		} 
     catch (error) {
+      setLoading(false);
+
 			await Swal.fire({
 				title: "Error!",
 				icon: "error",
@@ -54,6 +67,8 @@ const CaseDetail = () => {
 
   const fetchQuote = async () => {
     try {
+      setLoadingQuote(true);
+
 			const response = await fetch(`/api/cases/${caseId}/quotes`);
       const data = await response.json();
 
@@ -61,8 +76,12 @@ const CaseDetail = () => {
         setQuoteData(data.quotes);
       }
       else throw new Error(data.error);
+
+      setLoadingQuote(false);
 		} 
     catch (error) {
+      setLoadingQuote(false);
+
 			await Swal.fire({
 				title: "Error!",
 				icon: "error",
@@ -153,15 +172,17 @@ const CaseDetail = () => {
   }
 
 	return (
-		<PageContainer title="Case Detail" description="Add new case">
+		<PageContainer title="Case Detail" description="This is case detail">
 			<DashboardCard title="Case Detail">
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Status
             </Typography>
-            <Typography variant="body1">
-              {caseData?.status || "-"}
+            <Typography variant="body1" sx={{ marginTop: 0.5 }}>
+              {loading ? 'loading...' : (
+                caseData?.status ? <CaseStatusChip status={caseData.status} /> : '-'
+              )}
             </Typography>
           </Grid>
 
@@ -170,7 +191,9 @@ const CaseDetail = () => {
               Created At
             </Typography>
             <Typography variant="body1">
-              {caseData?.createdAt ? dayjs(caseData.createdAt).format("MMM DD, YYYY"): "-"}
+              {loading ? 'loading...' : (
+                caseData?.createdAt ? dayjs(caseData.createdAt).format("MMM DD, YYYY - HH:mm"): "-"
+              )}
             </Typography>
           </Grid>
 
@@ -179,7 +202,9 @@ const CaseDetail = () => {
               Title
             </Typography>
             <Typography variant="body1">
-              {caseData?.title || "-"}
+              {loading ? 'loading...' : (
+                caseData?.title || "-"
+              )}
             </Typography>
           </Grid>
 
@@ -188,7 +213,9 @@ const CaseDetail = () => {
               Category
             </Typography>
             <Typography variant="body1">
-              {caseData?.category || "-"}
+              {loading ? 'loading...' : (
+                caseData?.category ? getCaseCategoryLabel(caseData?.category) : "-"
+              )}
             </Typography>
           </Grid>
 
@@ -197,7 +224,9 @@ const CaseDetail = () => {
               Description
             </Typography>
             <Typography variant="body1">
-              {caseData?.description || "-"}
+              {loading ? 'loading...' : (
+                caseData?.description || "-"
+              )}
             </Typography>
           </Grid>
 
@@ -207,11 +236,14 @@ const CaseDetail = () => {
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
               Files
             </Typography>
-
-            {caseData?.files && caseData.files.length > 0 ? (
-              <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />
-            ) : (
+            {loading ? (
               <Typography variant="body1">-</Typography>
+            ) : (
+              caseData?.files && caseData.files.length > 0 ? (
+                <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />
+              ) : (
+                <Typography variant="body1">-</Typography>
+              )
             )}
           </Grid>
 
@@ -229,28 +261,32 @@ const CaseDetail = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {quoteData.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No cases found.
-                    </TableCell>
-                  </TableRow>
+                {loadingQuote ? (
+                  <TableState colSpan={5}>Loading...</TableState>
                 ) : (
-                  quoteData.map((c) => (
-                    <TableRow key={c.id} onClick={() => setMenuOpen(true)}>
-                      <TableCell sx={{ textTransform: "capitalize" }}>
-                        {c.amount}
-                      </TableCell>
-                      <TableCell>
-                        {c.expectedDays}
-                      </TableCell>
-                      <TableCell>
-                        <Chip label={c.status} component="span" size="small" />
-                      </TableCell>
-                      <TableCell>{c.note}</TableCell>
-                      <TableCell>{dayjs(c.createdAt).format("MMM DD, YYYY")}</TableCell>
-                    </TableRow>
-                  ))
+                  quoteData.length === 0 ? (
+                    <TableState colSpan={5}>Data not found</TableState>
+                  ) : (
+                    quoteData.map((c) => (
+                      <TableRowData key={c.id} onClick={() => setMenuOpen(true)}>
+                        <TableCell sx={{ textTransform: "capitalize" }}>
+                          {c.amount}
+                        </TableCell>
+                        <TableCell>
+                          {c.expectedDays}
+                        </TableCell>
+                        <TableCell>
+                          <Chip label={c.status} component="span" size="small" />
+                        </TableCell>
+                        <TableCell>
+                          {c.note}
+                        </TableCell>
+                        <TableCell>
+                          {dayjs(c.createdAt).format("MMM DD, YYYY")}
+                        </TableCell>
+                      </TableRowData>
+                    ))
+                  )
                 )}
               </TableBody>
             </Table>

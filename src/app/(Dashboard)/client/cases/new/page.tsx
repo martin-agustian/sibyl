@@ -30,14 +30,10 @@ const NewCases = () => {
 		register: registerCase,
 		handleSubmit: onSubmitCase,
 		formState: { errors: caseErrors },
+		reset: resetCase,
 	} = useForm<AddCasesSchema>({
 		resolver: zodResolver(addCasesSchema),
 		mode: "onChange",
-		defaultValues: {
-			title: "title",
-			category: "civil-law",
-			description: "lorem ipsum",
-		},
 	});
 
 	const handleSubmitCase = async (data: AddCasesSchema) => {
@@ -49,7 +45,6 @@ const NewCases = () => {
 			formData.append("category", data.category);
 			formData.append("description", data.description);
 
-			// file bisa multiple
 			if (data.files && data.files.length > 0) {
 				data.files.forEach((file) => {
 					formData.append("files", file);
@@ -63,13 +58,14 @@ const NewCases = () => {
 
 			if (res.ok) {
         const result = await res.json();
+				console.log(result);
+				resetCase();
         
         await Swal.fire({
           timer: 3000,
           title: "Success!",
           text: "Success created case",
           icon: "success",
-          showConfirmButton: false,
         });
       }
       else {
@@ -91,7 +87,7 @@ const NewCases = () => {
 	};
 
 	return (
-		<PageContainer title="New Case" description="Add new case">
+		<PageContainer title="New Case" description="This is new case">
 			<DashboardCard title="New Case">
 				<form onSubmit={onSubmitCase(handleSubmitCase)}>
 					<Grid container spacing={3}>
