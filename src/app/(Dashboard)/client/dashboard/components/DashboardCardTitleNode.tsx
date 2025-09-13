@@ -10,7 +10,8 @@ import Label from "@/components/form/Label";
 import InputSelect from "@/components/form/InputSelect";
 
 import { lawCategoryOptions, sortOptions } from "@/commons/options";
-import { UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { Control, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { CaseStatusEnum } from "@/commons/enum";
 
 export type FilterSchema = {
   title: string,
@@ -25,13 +26,14 @@ type DashboardCardTitleNodeProps = {
 	setOpenFilter: Dispatch<SetStateAction<boolean>>;
 	handleCloseFilter: () => void;
   registerFilter: UseFormRegister<FilterSchema>;
+  controlFilter: Control<any>;
   onSubmitFilter: UseFormHandleSubmit<FilterSchema>;
   handleSubmitFilter: (data: FilterSchema) => void;  
 };
 
 const DashboardCardTitleNode = ({ 
   title, openFilter, setOpenFilter, handleCloseFilter, 
-  registerFilter, onSubmitFilter, handleSubmitFilter,
+  registerFilter, controlFilter, onSubmitFilter, handleSubmitFilter,
 }: DashboardCardTitleNodeProps) => {
 	return (
 		<>
@@ -59,28 +61,28 @@ const DashboardCardTitleNode = ({
 
               <Grid size={{ xs: 12 }}>
                 <Label htmlFor="category">Category</Label>
-                <InputSelect id="category" placeholder="Select Category" items={lawCategoryOptions} defaultValue={""} {...registerFilter("category")} />
+                <InputSelect id="category" placeholder="Select Category" name="category" control={controlFilter} items={lawCategoryOptions} />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
                 <Label htmlFor="category">Status</Label>
-                <FormControlLabel label="Open" control={<Checkbox value="open" {...registerFilter("status")} />} />
-                <FormControlLabel label="Engaged" control={<Checkbox value="engaged" {...registerFilter("status")} />} />
-                <FormControlLabel label="Closed" control={<Checkbox value="closed" {...registerFilter("status")} />} />
-                <FormControlLabel label="Cancelled" control={<Checkbox value="cancelled" {...registerFilter("status")} />} />
+                <FormControlLabel label="Open" control={<Checkbox value={CaseStatusEnum.OPEN} {...registerFilter("status")} />} />
+                <FormControlLabel label="Engaged" control={<Checkbox value={CaseStatusEnum.ENGAGED} {...registerFilter("status")} />} />
+                <FormControlLabel label="Closed" control={<Checkbox value={CaseStatusEnum.CLOSED} {...registerFilter("status")} />} />
+                <FormControlLabel label="Cancelled" control={<Checkbox value={CaseStatusEnum.CANCELLED} {...registerFilter("status")} />} />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
                 <Label htmlFor="sort">Sort By</Label>
-                <InputSelect id="sort" placeholder="Select Sort By" items={sortOptions} defaultValue={""} {...registerFilter("sortBy")} />
+                <InputSelect id="sort" placeholder="Select Sort By" name="sortBy" control={controlFilter} items={sortOptions} />
               </Grid>
             </Grid>
           </DialogContent>
-          <DialogActions>
-            <Button variant="outlined" type="button" onClick={() => setOpenFilter(false)} sx={{ width: 100 }}>
+          <DialogActions sx={{ px: 3, pb: 3 }}>
+            <Button variant="outlined" type="button" onClick={() => setOpenFilter(false)} sx={{ width: 100, fontWeight: "bold" }}>
               Cancel
             </Button>
-            <Button variant="contained" type="submit" autoFocus sx={{ width: 100 }}>
+            <Button variant="contained" type="submit" sx={{ width: 100, fontWeight: "bold" }}>
               Filter
             </Button>
           </DialogActions>

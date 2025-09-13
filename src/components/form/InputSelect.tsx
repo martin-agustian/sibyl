@@ -4,7 +4,7 @@ import { Control, Controller } from "react-hook-form";
 type InputSelectProps = SelectProps & {
 	name: string;
 	placeholder: string;
-	control?: Control;
+	control?: Control<any>;
 	items: { label: string; value: string }[];
 };
 

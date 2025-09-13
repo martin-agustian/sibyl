@@ -34,6 +34,11 @@ const NewCases = () => {
 	} = useForm<AddCasesSchema>({
 		resolver: zodResolver(addCasesSchema),
 		mode: "onChange",
+		defaultValues: {
+			title: "",
+			category: "",
+			files: [],
+		},
 	});
 
 	const handleSubmitCase = async (data: AddCasesSchema) => {
@@ -100,7 +105,7 @@ const NewCases = () => {
 
 						<Grid size={{ xs: 12, md: 6 }}>
 							<Label htmlFor="category">Category</Label>
-							<InputSelect id="category" placeholder="Select Category" items={lawCategoryOptions} defaultValue={getValueCase("category")} {...registerCase("category")} />
+							<InputSelect id="category" placeholder="Select Category" name="category" control={controlCase} items={lawCategoryOptions} />
 
 							{caseErrors?.category?.message && <HelperTextError>{caseErrors.category.message}</HelperTextError>}
 						</Grid>

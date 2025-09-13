@@ -27,8 +27,9 @@ const Dashboard = () => {
 
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(2);
+  const [filter, setFilter] = useState<FilterSchema>();
   
   const router = useRouter();
 
@@ -48,7 +49,7 @@ const Dashboard = () => {
     },
   });
 
-  const fetchCases = async (filter?: FilterSchema) => {
+  const fetchCases = async () => {
     try {
       setLoading(true);
 
@@ -85,7 +86,7 @@ const Dashboard = () => {
 
 	useEffect(() => {
 		fetchCases();
-	}, [page]);
+	}, [filter, page]);
 
    const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -97,6 +98,8 @@ const Dashboard = () => {
   };
 
   const handleSubmitFilter = (data: FilterSchema) => {
+    setOpenFilter(false);
+    setFilter(data);
     setPage(0);
   }
 
@@ -110,6 +113,7 @@ const Dashboard = () => {
             setOpenFilter={setOpenFilter}
             handleCloseFilter={() => setOpenFilter(false)}
             registerFilter={registerFilter}
+            controlFilter={controlFilter}
             onSubmitFilter={onSubmitFilter}
             handleSubmitFilter={handleSubmitFilter}
           />

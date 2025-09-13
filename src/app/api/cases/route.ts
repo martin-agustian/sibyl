@@ -87,7 +87,9 @@ export async function GET(req: Request) {
 	const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
 	const title = searchParams.get("title") || "";
 	const category = searchParams.get("category") || "";
-	const status = searchParams.getAll("status").filter((v) => v) || "";
+	const status = searchParams.getAll("status")
+			.flatMap((v) => v.split(','))
+			.filter(Boolean) || [];
 	const sortBy = searchParams.get("sort") || "";
 
 	const where: any = { clientId: session.user.id };
