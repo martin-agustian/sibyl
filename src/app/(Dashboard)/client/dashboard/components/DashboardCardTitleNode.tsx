@@ -2,12 +2,13 @@ import { Dispatch, SetStateAction } from "react";
 
 import DashboardCardTitle from "@/app/(Dashboard)/components/card/DashboardCardTitle";
 
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, IconButton, Stack, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, IconButton, Stack, Typography } from "@mui/material";
 import { FilterAlt } from "@mui/icons-material";
 
 import InputText from "@/components/form/InputText";
 import Label from "@/components/form/Label";
 import InputSelect from "@/components/form/InputSelect";
+import InputCheckbox from "@/components/form/InputCheckbox";
 
 import { lawCategoryOptions, sortOptions } from "@/commons/options";
 import { Control, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
@@ -65,11 +66,11 @@ const DashboardCardTitleNode = ({
               </Grid>
 
               <Grid size={{ xs: 12 }}>
-                <Label htmlFor="category">Status</Label>
-                <FormControlLabel label="Open" control={<Checkbox value={CaseStatusEnum.OPEN} {...registerFilter("status")} />} />
-                <FormControlLabel label="Engaged" control={<Checkbox value={CaseStatusEnum.ENGAGED} {...registerFilter("status")} />} />
-                <FormControlLabel label="Closed" control={<Checkbox value={CaseStatusEnum.CLOSED} {...registerFilter("status")} />} />
-                <FormControlLabel label="Cancelled" control={<Checkbox value={CaseStatusEnum.CANCELLED} {...registerFilter("status")} />} />
+                <Label htmlFor="category">Status</Label>                
+                <FormControlLabel label="Open" control={<InputCheckbox value={CaseStatusEnum.OPEN} control={controlFilter} name="status" />} />
+                <FormControlLabel label="Engaged" control={<InputCheckbox value={CaseStatusEnum.ENGAGED} control={controlFilter} name="status" />} />
+                <FormControlLabel label="Closed" control={<InputCheckbox value={CaseStatusEnum.CLOSED} control={controlFilter} name="status" />} />
+                <FormControlLabel label="Cancelled" control={<InputCheckbox value={CaseStatusEnum.CANCELLED} control={controlFilter} name="status" />} />
               </Grid>
 
               <Grid size={{ xs: 12 }}>

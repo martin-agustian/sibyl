@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
 
-import DashboardCardTitle from "@/app/(Dashboard)/components/card/DashboardCardTitle";
-
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, IconButton, Stack } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, Grid, IconButton, Stack } from "@mui/material";
 import { FilterAlt } from "@mui/icons-material";
 
+import DashboardCardTitle from "@/app/(Dashboard)/components/card/DashboardCardTitle";
 import InputText from "@/components/form/InputText";
 import Label from "@/components/form/Label";
 import InputSelect from "@/components/form/InputSelect";
+import InputCheckbox from "@/components/form/InputCheckbox";
 
 import { lawCategoryOptions, sortOptions } from "@/commons/options";
 import { Control, UseFormHandleSubmit, UseFormRegister, UseFormReset } from "react-hook-form";
@@ -72,9 +72,9 @@ const DashboardCardTitleNode = ({
 
               <Grid size={{ xs: 12 }}>
                 <Label htmlFor="category">Status</Label>
-                <FormControlLabel label="Proposed" control={<Checkbox value={QuoteStatusEnum.PROPOSED} {...registerFilter("status")} />} />
-                <FormControlLabel label="Accepted" control={<Checkbox value={QuoteStatusEnum.ACCEPTED} {...registerFilter("status")} />} />
-                <FormControlLabel label="Rejected" control={<Checkbox value={QuoteStatusEnum.REJECTED} {...registerFilter("status")} />} />
+                <FormControlLabel label="Proposed" control={<InputCheckbox value={QuoteStatusEnum.PROPOSED} control={controlFilter} name="status" />} />
+                <FormControlLabel label="Accepted" control={<InputCheckbox value={QuoteStatusEnum.ACCEPTED} control={controlFilter} name="status" />} />
+                <FormControlLabel label="Rejected" control={<InputCheckbox value={QuoteStatusEnum.REJECTED} control={controlFilter} name="status" />} />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
