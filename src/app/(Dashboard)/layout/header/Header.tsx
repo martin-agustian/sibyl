@@ -41,6 +41,8 @@ const Header = ({ toggleMobileSidebar }: ItemType) => {
 							lg: "none",
 							xs: "inline",
 						},
+						height: "46px",
+						width: "46px",
 					}}>
 					<IconMenu width="20" height="20" />
 				</IconButton>

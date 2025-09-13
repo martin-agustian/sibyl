@@ -83,11 +83,11 @@ const MSidebar = ({
       open={isMobileSidebarOpen}
       onClose={onSidebarClose}
       variant="temporary"
-
       slotProps={{
         paper: {
           sx: {
             boxShadow: (theme) => theme.shadows[8],
+            minWidth: sidebarWidth,
             ...scrollbarStyles,
           },
         }
