@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
-import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
+import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
 
 import { Grid } from "@mui/system";
 import { Chip, Typography } from "@mui/material";

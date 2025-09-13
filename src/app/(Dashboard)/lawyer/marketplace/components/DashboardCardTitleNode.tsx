@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import DashboardCardTitle from "@/app/(Dashboard)/components/shared/DashboardCardTitle";
+import DashboardCardTitle from "@/app/(Dashboard)/components/card/DashboardCardTitle";
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Stack } from "@mui/material";
 import { FilterAlt } from "@mui/icons-material";

@@ -6,7 +6,7 @@ import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
-import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
+import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
 import TableRowData from "@/components/table/TableRowData";
 import TableState from "@/components/table/TableState";
 import StatusChip from "@/components/chip/StatusChip";

@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
-import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
+import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
 import TableState from "@/components/table/TableState";
 import TableRowData from "@/components/table/TableRowData";
 import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";

@@ -6,8 +6,8 @@ import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
-import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
-import DashboardCardTitle from "@/app/(Dashboard)/components/shared/DashboardCardTitle";
+import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
+import DashboardCardTitle from "@/app/(Dashboard)/components/card/DashboardCardTitle";
 import FilePreview from "@/components/preview/FilePreview";
 import TableRowData from "@/components/table/TableRowData";
 import TableState from "@/components/table/TableState";
