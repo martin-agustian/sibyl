@@ -16,7 +16,7 @@ import AuthRegister from "./components/AuthRegister";
 
 import { UserRoleEnum } from "@/commons/enum";
 import { registerSchema, RegisterSchema } from "@/schemas/auth/registerSchema";
-import { RegisterBody } from "@/types/request/auth";
+import { RegisterBody } from "@/types/request/Auth";
 
 const Register = () => {
   const router = useRouter();

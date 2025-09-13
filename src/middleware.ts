@@ -9,6 +9,13 @@ export async function middleware(req: NextRequest) {
 
 	if (!pathname.startsWith("/api")) {
 		if (token) { // has token
+			if (pathname === "/dashboard" && token.role === UserRoleEnum.CLIENT) {
+				return NextResponse.redirect(new URL(process.env.NEXT_PUBLIC_DASHBOARD_CLIENT_PATH ?? "/", req.url));
+			}
+			if (pathname === "/dashboard" && token.role === UserRoleEnum.LAWYER) {
+				return NextResponse.redirect(new URL(process.env.NEXT_PUBLIC_DASHBOARD_LAWYER_PATH ?? "/", req.url));
+			}
+
 			if (pathname.startsWith("/login")) {
 				return NextResponse.redirect(new URL("/", req.url));
 			}

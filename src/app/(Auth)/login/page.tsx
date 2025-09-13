@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginSchema } from "@/schemas/auth/loginSchema";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 
@@ -16,15 +16,9 @@ import PageContainer from "@/app/(Dashboard)/components/container/PageContainer"
 import Logo from "@/components/Logo";
 import AuthLogin from "./components/AuthLogin";
 
-import { UserRole } from "@/commons/type";
-import { UserRoleEnum } from "@/commons/enum";
-
 const Login = () => {
 	const searchParams = useSearchParams();
-	const callbackUrl = searchParams.get("callbackUrl") || "/";
-
-	const { data: session } = useSession();
-	const userRole = session?.user.role as UserRole;
+	const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
 	const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
 
@@ -40,9 +34,6 @@ const Login = () => {
 	const handleSubmit = async (data: LoginSchema) => {
 		try {
 			setLoadingSubmit(true);
-
-			const clientDashboard = process.env.NEXT_PUBLIC_DASHBOARD_CLIENT_PATH ?? "/";
-			const lawyerDashboard = process.env.NEXT_PUBLIC_DASHBOARD_LAWYER_PATH ?? "/";
 	
 			const response = await signIn("credentials", {
 				email: data.email,
@@ -58,10 +49,8 @@ const Login = () => {
 					icon: "success",
 					showConfirmButton: false,
 				});
-	
-				window.location.href = 
-					callbackUrl ?? userRole == UserRoleEnum.CLIENT ? 
-						clientDashboard : lawyerDashboard;
+								
+				window.location.href = callbackUrl;
 			} else {
 				throw new Error(response?.error ?? "");
 			}

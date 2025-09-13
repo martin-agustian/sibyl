@@ -53,11 +53,11 @@ const AuthRegister = ({
           </Typography>
           
           <InputText id="name" fullWidth variant="outlined" size="small" 
-            placeholder="Enter Name" {...register("email")} />
+            placeholder="Enter Name" {...register("name")} />
           
-          {errors?.email?.message && (
+          {errors?.name?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
-              {errors.email.message}
+              {errors.name.message}
             </Typography>
           )}
         </Box>
