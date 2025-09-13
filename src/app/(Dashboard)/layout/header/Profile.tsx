@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+
 import {
   Avatar,
   Box,
@@ -9,19 +11,22 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Typography,
 } from "@mui/material";
-
-import { IconListCheck, IconMail, IconUser } from "@tabler/icons-react";
-
-import { signOut } from "next-auth/react";
+import { IconUser } from "@tabler/icons-react";
 
 const Profile = () => {
-  const [anchorEl2, setAnchorEl2] = useState(null);
-  const handleClick2 = (event: any) => {
-    setAnchorEl2(event.currentTarget);
+  const router = useRouter();
+
+  const { data: session } = useSession();
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
   };
-  const handleClose2 = () => {
-    setAnchorEl2(null);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -33,11 +38,11 @@ const Profile = () => {
         aria-controls="msgs-menu"
         aria-haspopup="true"
         sx={{
-          ...(typeof anchorEl2 === "object" && {
+          ...(typeof anchorEl === "object" && {
             color: "primary.main",
           }),
         }}
-        onClick={handleClick2}
+        onClick={handleClick}
       >
         <Avatar
           src="/images/profile/user-1.jpg"
@@ -53,19 +58,27 @@ const Profile = () => {
       {/* ------------------------------------------- */}
       <Menu
         id="msgs-menu"
-        anchorEl={anchorEl2}
+        anchorEl={anchorEl}
         keepMounted
-        open={Boolean(anchorEl2)}
-        onClose={handleClose2}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         sx={{
           "& .MuiMenu-paper": {
-            width: "200px",
+            width: "220px",
           },
         }}
       >
-        <MenuItem>
+        <Box py={1} px={2}>
+          <Typography>
+            Hi,{" "}
+            <Typography component="span" sx={{ fontSize: "13px", fontWeight: "bold" }}>
+              {session?.user.name}
+            </Typography> 
+          </Typography>
+        </Box>
+        <MenuItem onClick={() => { router.push("/profile"); handleClose(); }}>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>

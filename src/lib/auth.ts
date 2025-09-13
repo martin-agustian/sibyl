@@ -29,6 +29,7 @@ export const authOptions: NextAuthOptions = {
 
 				return {
 					id: user.id,
+					name: user.name,
 					email: user.email,
 					role: user.email === process.env.ADMIN_EMAIL ? UserRoleEnum.ADMIN : user.role,
 					emailVerif: user.emailVerif,
@@ -42,6 +43,8 @@ export const authOptions: NextAuthOptions = {
 			if (user) {
 				token.id = user.id;
 				token.role = user.role;
+				token.email = user.email;
+				token.name = user.name;
 				token.emailVerif = user.emailVerif;
 				token.accountVerif = user.accountVerif;
 			}
@@ -51,6 +54,8 @@ export const authOptions: NextAuthOptions = {
 			if (token) {
 				session.user.id = token.id as string;
 				session.user.role = token.role as string;
+				session.user.email = token.email as string;
+				session.user.name = token.name as string;
 				session.user.emailVerif = token.emailVerif as boolean;
 				session.user.accountVerif = token.accountVerif as boolean;
 			}

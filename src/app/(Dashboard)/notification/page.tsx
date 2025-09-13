@@ -96,7 +96,7 @@ export const Notification = () => {
 						) : (
 							<Grid size={{ xs: 12 }}>
 								<Typography variant="body1" sx={{ fontSize: "14px" }}>
-									Data not found
+									Notification is empty
 								</Typography>
 							</Grid>
 						)
