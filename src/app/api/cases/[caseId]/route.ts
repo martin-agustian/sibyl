@@ -52,7 +52,7 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 			});
 
 			if (myQuoteData?.status === QuoteStatusEnum.ACCEPTED && caseData.status === CaseStatusEnum.ENGAGED) {
-				// ✅ Check Payment Status must "paid"
+				// Check Payment Status must "paid"
 				const payment = await prisma.payment.findFirst({
 					where: {
 						caseId: caseData.id,

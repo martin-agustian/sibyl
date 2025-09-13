@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
+import DashboardCardTitle from "@/app/(Dashboard)/components/shared/DashboardCardTitle";
 import FilePreview from "@/components/preview/FilePreview";
 import TableRowData from "@/components/table/TableRowData";
 import TableState from "@/components/table/TableState";
@@ -23,14 +24,16 @@ import {
   DialogTitle,
   DialogActions,
   Stack,
-  Box,
+  IconButton,
 } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
 import { QuoteModel } from "@/types/model/Quote";
+
 import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
-import DashboardCardTitle from "@/app/(Dashboard)/components/shared/DashboardCardTitle";
+import { CaseStatusEnum } from "@/commons/enum";
+import { IconEdit } from "@tabler/icons-react";
 
 const CaseDetail = () => {
 	const { caseId } = useParams();
@@ -47,10 +50,11 @@ const CaseDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(1);
   
-  const [selectedQuoteNote, setSelectedQuoteNote] = useState<string>("");
+  const [selectedQuote, setSelectedQuote] = useState<QuoteModel>();
 
   const [quoteNoteOpen, setQuoteNoteOpen] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [menuCaseOpen, setMenuCaseOpen] = useState<boolean>(false);
 
 	const fetchCase = async () => {
 		try {
@@ -182,7 +186,8 @@ const CaseDetail = () => {
 
   const handleAcceptQuote = async () => {
     try {
-			const response = await fetch(`/api/cases/${caseId}/quotes/cmffsebxl000au1ycwo9y55jd/accept`, {
+      if (!selectedQuote?.id) return;
+			const response = await fetch(`/api/cases/${caseId}/quotes/${selectedQuote.id}/accept`, {
         method: "POST",
       });
       const data = await response.json();
@@ -201,9 +206,65 @@ const CaseDetail = () => {
 		}
   }
 
+  const handleCloseCase = async () => {
+    await Swal.fire({
+      title: "Warning!",
+      icon: "warning",
+      text: "Are you sure want to close this case? This action can't be reverted.",
+      showCancelButton: true,
+      confirmButtonText: "Yes, close it!",
+      showLoaderOnConfirm: true,
+      allowOutsideClick: () => !Swal.isLoading(),
+      preConfirm: async () => {
+        try {
+          const response = await fetch(`/api/cases/${caseId}/close`, {
+            method: "PATCH",
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || "Failed to close case.");
+          }
+
+          return data;
+        } catch (error) {
+          Swal.showValidationMessage(
+            error instanceof Error ? error.message : (error as string)
+          );
+          return false;
+        }
+      }
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await Swal.fire({
+          timer: 3000,
+          title: "Success!",
+          text: "Successfully closed the case.",
+          icon: "success",
+          showConfirmButton: false,
+        });
+      }
+      window.location.reload();
+    });
+  }
+
 	return (
 		<PageContainer title="Case Detail" description="This is case detail">
-			<DashboardCard title="Case Detail">
+			<DashboardCard 
+        titleNode={
+          <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
+            <DashboardCardTitle>Case Detail</DashboardCardTitle>
+
+            {caseData?.status !== CaseStatusEnum.CLOSED && (
+              <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
+                <IconButton size="small" color="primary" onClick={() => setMenuCaseOpen(true)}>
+                  <IconEdit fontSize="small"></IconEdit>
+                </IconButton>
+              </Stack>
+            )}
+          </Stack>
+        }
+      >
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Typography variant="subtitle2" sx={{ color: "primary.main", fontWeight: "bold" }}>
@@ -300,7 +361,7 @@ const CaseDetail = () => {
                     <TableState colSpan={5}>Data not found</TableState>
                   ) : (
                     quoteData.map((c) => (
-                      <TableRowData key={c.id} onClick={() => setMenuOpen(true)}>
+                      <TableRowData key={c.id} onClick={() => { setMenuOpen(true); setSelectedQuote(c); }}>
                         <TableCell sx={{ textTransform: "capitalize" }}>
                           {formatNumber(c.amount)}
                         </TableCell>
@@ -316,7 +377,7 @@ const CaseDetail = () => {
                             maxChars={100} 
                             sxButton={{ fontSize: "0.75rem" }}
                             onClickReadmore={() => {
-                              setSelectedQuoteNote(c.note);
+                              setSelectedQuote(c);
                               setQuoteNoteOpen(true);
                             }} 
                           />
@@ -344,26 +405,46 @@ const CaseDetail = () => {
         </Grid>
       </DashboardCard>
 
-      <Dialog fullWidth maxWidth="xs" open={menuOpen} onClose={() => setMenuOpen(false)}>
+      <Dialog fullWidth maxWidth="xs" open={menuCaseOpen} onClose={() => setMenuCaseOpen(false)}>
         <DialogTitle>
-          Menu
+          Case Menu
         </DialogTitle>
         <DialogContent>
           <Stack gap={1}>
-            <Button
-              fullWidth 
-              variant="outlined" 
-              onClick={handleAcceptQuote}
-            >
-              Accept Quote
-            </Button>
+            {caseData?.status === CaseStatusEnum.ENGAGED && (
+              <Button
+                fullWidth 
+                variant="outlined" 
+                onClick={handleCloseCase}
+              >
+                Close Case
+              </Button>
+            )}
+          </Stack>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog fullWidth maxWidth="xs" open={menuOpen} onClose={() => setMenuOpen(false)}>
+        <DialogTitle>
+          Quotes Menu
+        </DialogTitle>
+        <DialogContent>
+          <Stack gap={1}>
+            {caseData?.status === CaseStatusEnum.OPEN && (
+              <Button
+                fullWidth 
+                variant="outlined" 
+                onClick={handleAcceptQuote}
+              >
+                Accept Quote
+              </Button>
+            )}
             <Button
               fullWidth 
               variant="outlined" 
               onClick={() => setQuoteNoteOpen(true)}
-              sx={{ display: { xs: "block", md: "none" } }}
             >
-              See Note
+              Open Note
             </Button>
           </Stack>
         </DialogContent>
@@ -374,7 +455,7 @@ const CaseDetail = () => {
           Note
         </DialogTitle>
         <DialogContent>
-          {selectedQuoteNote}
+          {selectedQuote?.note}
         </DialogContent>
         <DialogActions>
           <Button 

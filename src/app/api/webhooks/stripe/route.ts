@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       });
 
       if (payment) {
-		    // ✅ Update DB: accept quote, reject others, engage case
+		    // Update DB: accept quote, reject others, engage case
         await prisma.$transaction([
           prisma.quote.update({
             where: { id: payment.quoteId },

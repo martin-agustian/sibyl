@@ -30,7 +30,7 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 			return NextResponse.json({ error: "Case not found" }, { status: 404 });
 		}
 
-		// 🔒 Access control
+		// Access control
 		if (role === UserRoleEnum.CLIENT) {
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -40,7 +40,7 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
-		// ✅ Build filter
+		// Build filter
 		const where: any = { caseId };
 		if (status) where.status = status;
 

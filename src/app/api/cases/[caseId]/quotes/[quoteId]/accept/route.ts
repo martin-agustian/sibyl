@@ -19,7 +19,6 @@ export async function POST(req: Request, { params }: { params: { caseId: string;
 
 		const clientId = session.user.id;
 
-		// 🔎 Ambil case + quote
 		const caseData = await prisma.case.findUnique({
 			where: { id: caseId },
 			include: { quotes: true },
@@ -38,7 +37,7 @@ export async function POST(req: Request, { params }: { params: { caseId: string;
 			return NextResponse.json({ error: "Quote not found" }, { status: 404 });
 		}
 
-		// ✅ Buat Stripe Checkout Session
+		// Stripe Checkout Session
 		const checkoutSession = await stripe.checkout.sessions.create({
 			mode: "payment",
 			payment_method_types: ["card"],
@@ -59,7 +58,7 @@ export async function POST(req: Request, { params }: { params: { caseId: string;
 			cancel_url: `${process.env.APP_URL}/client/cases/${caseId}?payment-status=failed`,
 		});
 
-		// ✅ Simpan Payment record
+		// Save Payment record
 		await prisma.payment.create({
 			data: {
 				caseId,

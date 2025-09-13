@@ -24,7 +24,6 @@ export async function GET(req: Request, { params }: { params: { caseId: string; 
 		const userId = session.user.id;
 		const role = session.user.role;
 
-		// Ambil case + file
 		const file = await prisma.file.findUnique({
 			where: { id: fileId },
 			include: { case: { include: { quotes: true } } },
@@ -36,7 +35,7 @@ export async function GET(req: Request, { params }: { params: { caseId: string; 
 
 		const caseData = file.case;
 
-		// 🔒 Access Control
+		// Access Control
 		if (role === UserRoleEnum.CLIENT) {
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -68,7 +67,7 @@ export async function GET(req: Request, { params }: { params: { caseId: string; 
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
-		// ✅ Generate signed URL (short-lived)
+		// Generate signed URL (short-lived)
 		const signedUrl = cloudinary.v2.utils.private_download_url(
 			file.storagePath, // public_id (not secure_url)
 			file.mimeType.includes("pdf") ? "pdf" : "jpg", // resource type
