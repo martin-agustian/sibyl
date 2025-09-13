@@ -32,6 +32,8 @@ export const authOptions: NextAuthOptions = {
 					name: user.name,
 					email: user.email,
 					role: user.email === process.env.ADMIN_EMAIL ? UserRoleEnum.ADMIN : user.role,
+					jurisdiction: user.jurisdiction,
+					barNumber: user.barNumber,
 					emailVerif: user.emailVerif,
 					accountVerif: user.accountVerif,
 				};

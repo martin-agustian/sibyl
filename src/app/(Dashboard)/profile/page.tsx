@@ -1,55 +1,43 @@
 "use client";
-import Swal from "sweetalert2";
-
-import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
 
-import { Grid } from "@mui/system";
-import { Chip, Typography } from "@mui/material";
-
-import { NotificationModel } from "@/types/model/Notification";
+import { Box, Stack } from "@mui/system";
+import { Avatar, Chip, Typography } from "@mui/material";
 
 export const Notification = () => {
-  const [notifications, setNotifications] = useState<NotificationModel[]>([]);
-
-  const fetchNotification = async () => {
-    try {
-      const response = await fetch(`/api/notification`);
-      const data = await response.json();
-
-      if (response.ok) {
-        setNotifications(data.notifications);
-      }
-      else throw new Error(data.error);
-    } 
-    catch (error) {
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchNotification();
-  }, []);
+  const { data: session } = useSession();
 
   return (
     <PageContainer title="My Profile" description="my profile">
       <DashboardCard title="My Profile">
-        <Grid container spacing={2}>
-          {notifications.map(n => (
-            <Grid size={{ xs: 12 }}>
-              <Chip label={n.type} size="small" />
-              <Typography variant="body1">
-                {n.message}
-              </Typography>
-            </Grid>
-          ))}
-        </Grid>
+        <Stack 
+          direction={{ sx: "column", md: "row" }}
+          gap={{ xs: 3, md: 8 }}
+          alignItems="center"
+        >
+          <Avatar
+            src="/images/profile/user-1.jpg"
+            alt="image"
+            sx={{
+              width: 150,
+              height: 150,
+            }}
+          />
+          <Stack gap={2} sx={{ textAlign: { xs: "center", md: "left" } }}>
+            <Box> 
+              <Chip label={session?.user.role} size="small" />
+            </Box>
+            <Typography variant="body1" sx={{ color: "primary.main", fontSize: "40px", fontWeight: "bold",  mt: 0.5 }}>
+              {session?.user.name}
+            </Typography>
+            <Typography variant="body1" sx={{ mt: 0.5 }}>
+              {session?.user.email}
+            </Typography>
+          </Stack>
+        </Stack>
       </DashboardCard>
     </PageContainer>
   );
