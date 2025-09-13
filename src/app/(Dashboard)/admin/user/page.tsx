@@ -1,29 +1,48 @@
 "use client";
+import dayjs from "dayjs";
 import Swal from "sweetalert2";
 
-import { useEffect, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
+import TableState from "@/components/table/TableState";
 
-import { Grid } from "@mui/system";
-import { Chip, Typography } from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 
-import { NotificationModel } from "@/types/model/Notification";
+import { UserModel } from "@/types/model/User";
 
-export const Notification = () => {
-  const [notifications, setNotifications] = useState<NotificationModel[]>([]);
+const User = () => {
+  const [users, setUsers] = useState<UserModel[]>([]);
+  const [usersTotal, setUsersTotal] = useState<number>(0);
 
-  const fetchNotification = async () => {
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
+  const fetchUsers = async () => {
     try {
-      const response = await fetch(`/api/notification`);
+      setLoading(true);
+
+      const query = new URLSearchParams({
+        page: (page + 1).toString(),
+        pageSize: rowsPerPage.toString(),
+      });
+  
+      const response = await fetch(`/api/admin/user?${query.toString()}`);
       const data = await response.json();
 
       if (response.ok) {
-        setNotifications(data.notifications);
+        setUsers(data.users || []);
+        setUsersTotal(data.total);
       }
-      else throw new Error(data.error);
-    } 
+      else {
+        throw new Error(data.error);
+      }
+
+      setLoading(false);
+    }
     catch (error) {
       await Swal.fire({
         title: "Error!",
@@ -34,25 +53,68 @@ export const Notification = () => {
   };
 
   useEffect(() => {
-    fetchNotification();
-  }, []);
+    fetchUsers();
+  }, [page]);
+
+   const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
-    <PageContainer title="Notification" description="notification">
-      <DashboardCard title="Notification">
-        <Grid container spacing={2}>
-          {notifications.map(n => (
-            <Grid size={{ xs: 12 }}>
-              <Chip label={n.type} size="small" />
-              <Typography variant="body1">
-                {n.message}
-              </Typography>
-            </Grid>
-          ))}
-        </Grid>
+    <PageContainer title="Users" description="This is user list">
+      <DashboardCard title="Users">
+        <TableContainer component={Paper} elevation={9}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Jurisdiction</TableCell>
+                <TableCell>Bar Number</TableCell>
+                <TableCell>Created</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading ? (
+                <TableState colSpan={6}>Loading...</TableState>
+              ) : (
+                users.length === 0 ? (
+                  <TableState colSpan={6}>Data not found</TableState>
+                ) : (
+                  users.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell sx={{ textTransform: "capitalize" }}>{c.name}</TableCell>
+                      <TableCell>{c.email}</TableCell>
+                      <TableCell>{c.role}</TableCell>
+                      <TableCell>{c.jurisdiction ?? "-"}</TableCell>
+                      <TableCell>{c.barNumber ?? "-"}</TableCell>
+                      <TableCell>{dayjs(c.createdAt).format("MMM DD, YYYY")}</TableCell>
+                    </TableRow>
+                  ))
+                )
+              )}
+            </TableBody>
+          </Table>
+
+          <TablePagination
+            rowsPerPageOptions={[1, 2, 25]}
+            component="div"
+            count={usersTotal}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </TableContainer>
       </DashboardCard>
     </PageContainer>
   );
 };
 
-export default Notification;
+export default User;

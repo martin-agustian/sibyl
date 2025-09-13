@@ -1,5 +1,6 @@
-import { CaseModel } from "./Case";
 import { QuoteStatus } from "@/commons/type";
+import { CaseModel } from "./Case";
+import { UserModel } from "./User";
 
 export type QuoteModel = {
 	id: string;

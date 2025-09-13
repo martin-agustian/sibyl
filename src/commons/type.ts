@@ -1,6 +1,6 @@
 import { CaseStatusEnum, QuoteStatusEnum, UserRoleEnum } from "./enum";
 
-export type UserRole = UserRoleEnum.CLIENT | UserRoleEnum.LAWYER;
+export type UserRole = UserRoleEnum.CLIENT | UserRoleEnum.LAWYER | UserRoleEnum.ADMIN;
 
 export type CaseStatus =
   | CaseStatusEnum.OPEN

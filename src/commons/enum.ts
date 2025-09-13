@@ -1,6 +1,7 @@
 export enum UserRoleEnum {
   CLIENT = "CLIENT",
   LAWYER = "LAWYER",
+  ADMIN = "ADMIN",
 }
 
 export enum CaseStatusEnum {

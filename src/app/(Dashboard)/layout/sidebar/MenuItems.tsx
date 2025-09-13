@@ -14,7 +14,10 @@ export const getMenuItems = (role: UserRole) => {
       id: uniqueId(),
       title: "Dashboard",
       icon: IconLayoutDashboard,
-      href: role === UserRoleEnum.CLIENT ? "/client/dashboard" : "/lawyer/marketplace",
+      href: 
+        role === UserRoleEnum.ADMIN ? process.env.NEXT_PUBLIC_DASHBOARD_ADMIN_PATH :
+        role === UserRoleEnum.CLIENT ? process.env.NEXT_PUBLIC_DASHBOARD_CLIENT_PATH :
+        process.env.NEXT_PUBLIC_DASHBOARD_LAWYER_PATH
     },
   ];
 

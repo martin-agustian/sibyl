@@ -9,33 +9,21 @@ export async function middleware(req: NextRequest) {
 
 	if (!pathname.startsWith("/api")) {
 		if (token) { // has token
-			const adminEmail = process.env.ADMIN_EMAIL;
 
 			// -- admin dashboard
-			if (
-				pathname === "/dashboard" && 
-				token.email === adminEmail
-			) {
+			if (pathname === "/dashboard" &&  token.role === UserRoleEnum.ADMIN) {
 				return NextResponse.redirect(
 					new URL(process.env.NEXT_PUBLIC_DASHBOARD_ADMIN_PATH ?? "/", req.url)
 				);
 			}
 			// -- client dashboard
-			if (
-				pathname === "/dashboard" && 
-				token.email !== adminEmail && 
-				token.role === UserRoleEnum.CLIENT
-			) {
+			if (pathname === "/dashboard" &&  token.role === UserRoleEnum.CLIENT) {
 				return NextResponse.redirect(
 					new URL(process.env.NEXT_PUBLIC_DASHBOARD_CLIENT_PATH ?? "/", req.url)
 				);
 			}
 			// -- lawyer dashboard
-			if (
-				pathname === "/dashboard" &&
-				token.email !== adminEmail && 
-				token.role === UserRoleEnum.LAWYER
-			) {
+			if (pathname === "/dashboard" && token.role === UserRoleEnum.LAWYER) {
 				return NextResponse.redirect(
 					new URL(process.env.NEXT_PUBLIC_DASHBOARD_LAWYER_PATH ?? "/", req.url)
 				);
@@ -47,21 +35,15 @@ export async function middleware(req: NextRequest) {
 			}
 			
 			// -- admin sub path
-			if (pathname.startsWith("/admin") && token.email !== adminEmail) {
+			if (pathname.startsWith("/admin") && token.role !== UserRoleEnum.ADMIN) {
 				return NextResponse.redirect(new URL("/unauthorized", req.url));
 			}
 			// -- client sub path
-			if (
-				pathname.startsWith("/client") && 
-				(token.role !== UserRoleEnum.CLIENT || token.email === adminEmail)
-			) {
+			if (pathname.startsWith("/client") && token.role !== UserRoleEnum.CLIENT) {
 				return NextResponse.redirect(new URL("/unauthorized", req.url));
 			}
 			// -- lawyer sub path
-			if (
-				pathname.startsWith("/lawyer") && 
-				(token.role !== UserRoleEnum.LAWYER || token.email === adminEmail)
-			) {
+			if (pathname.startsWith("/lawyer") && token.role !== UserRoleEnum.LAWYER) {
 				return NextResponse.redirect(new URL("/unauthorized", req.url));
 			}
 		}

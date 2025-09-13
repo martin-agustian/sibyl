@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 
 import { NextAuthOptions } from "next-auth";
+import { UserRoleEnum } from "@/commons/enum";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -29,7 +30,7 @@ export const authOptions: NextAuthOptions = {
 				return {
 					id: user.id,
 					email: user.email,
-					role: user.role,
+					role: user.email === process.env.ADMIN_EMAIL ? UserRoleEnum.ADMIN : user.role,
 					emailVerif: user.emailVerif,
 					accountVerif: user.accountVerif,
 				};
