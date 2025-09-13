@@ -8,7 +8,7 @@ import { CaseStatusEnum, UserRoleEnum } from "@/commons/enum";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export async function POST(req: Request, { params }: { params: { caseId: string; quoteId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ caseId: string; quoteId: string }> }) {
 	try {
 		const { caseId, quoteId } = await params;
 

@@ -5,14 +5,15 @@ import { authOptions } from "@/lib/auth";
 import { sendMail } from "@/lib/mailer";
 import { CaseStatusEnum, QuoteStatusEnum, UserRoleEnum } from "@/commons/enum";
 
-export async function POST(req: Request, { params }: { params: { caseId: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
 	try {
+		const { caseId } = await params;
+
 		const session = await getServerSession(authOptions);
 		if (!session || session.user.role !== UserRoleEnum.LAWYER) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 		const lawyerId = session.user.id;
-		const caseId = params.caseId;
 		
 		const body = await req.json();
 		const { amount, expectedDays, note } = body;

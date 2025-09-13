@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { UserRoleEnum } from "@/commons/enum";
 
-export async function GET(req: Request, { params }: { params: { caseId: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
 	try {
     const { caseId } = await params;
 		const { searchParams } = new URL(req.url);

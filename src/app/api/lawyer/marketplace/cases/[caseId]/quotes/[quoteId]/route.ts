@@ -4,15 +4,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { CaseStatusEnum, QuoteStatusEnum, UserRoleEnum } from "@/commons/enum";
 
-export async function PATCH(req: Request, { params }: { params: { caseId: string; quoteId: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ caseId: string; quoteId: string }> }) {
 	try {
+		const { caseId, quoteId } = await params;
+
 		const session = await getServerSession(authOptions);
 		if (!session || session.user.role !== UserRoleEnum.LAWYER) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const lawyerId = session.user.id;
-		const { caseId, quoteId } = params;
 
 		const body = await req.json();
 		const { amount, expectedDays, note } = body;

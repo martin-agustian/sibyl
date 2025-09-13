@@ -7,7 +7,7 @@ import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
 import { Box, Stack } from "@mui/system";
 import { Avatar, Chip, Typography } from "@mui/material";
 
-export const Notification = () => {
+const Profile = () => {
   const { data: session } = useSession();
 
   return (
@@ -43,4 +43,4 @@ export const Notification = () => {
   );
 };
 
-export default Notification;
+export default Profile;

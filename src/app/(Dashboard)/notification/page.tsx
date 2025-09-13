@@ -12,7 +12,7 @@ import { Chip, Pagination, Typography } from "@mui/material";
 
 import { NotificationModel } from "@/types/model/Notification";
 
-export const Notification = () => {
+const Notification = () => {
 	const [loading, setLoading] = useState<boolean>(true);
 	
 	const [notifications, setNotifications] = useState<NotificationModel[]>([]);
