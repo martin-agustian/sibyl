@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 
 import { Button, Dialog, DialogActions, DialogContent, Grid, Typography } from "@mui/material";
 import ReadMoreText from "@/components/text/ReadMoreText";
+import FilePreview from "@/components/preview/FilePreview";
 
 import { CaseModel } from "@/types/model/Case";
 import { getCaseCategoryLabel } from "@/commons/helper";
+
+import { FileModel } from "@/types/model/File";
 
 type DialogSummaryProps = {
 	caseId: string;
@@ -48,6 +51,33 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 	useEffect(() => {
 		if (open === true) fetchCase();
 	}, [open]);
+
+	const handleDownloadFile = async (file: FileModel) => {
+		try {
+			if (!file.id) return;
+			const response = await fetch(`/api/cases/${caseId}/files/${file.id}`);
+			if (response.ok) {
+				const blob = await response.blob();
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = file.originalName || "downloaded-file";
+				a.click();
+				URL.revokeObjectURL(url);
+			}
+			else {
+				const data = await response.json();
+				throw new Error(data.error);
+			}
+		} 
+		catch (error) {
+			await Swal.fire({
+				title: "Error!",
+				icon: "error",
+				text: error instanceof Error ? error.message : (error as string),
+			});
+		}
+	}
 
 	return (
 		<Dialog open={open} onClose={onDialogClose}>
@@ -97,6 +127,21 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 							)}
 						</Typography>
 					</Grid>
+
+					<Grid size={12}>
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+              Files
+            </Typography>
+            {loading ? (
+              <Typography variant="body1">loading...</Typography>
+            ) : (
+              caseData?.files && caseData.files.length > 0 ? (
+                <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />
+              ) : (
+                <Typography variant="body1">-</Typography>
+              )
+            )}
+          </Grid>
 				</Grid>				
 			</DialogContent>
 			<DialogActions>

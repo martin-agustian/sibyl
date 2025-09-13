@@ -32,7 +32,7 @@ const ExpItem = ({ item }: { item: { label: string; value: string } }) => {
 
 const Hero = () => {
 	return (
-		<Box id="hero" sx={{ backgroundColor: "background.paper", position: "relative", py: { xs: 5, md: 8 } }}>
+		<Box sx={{ backgroundColor: "background.paper", position: "relative", py: { xs: 5, md: 8 } }}>
 			<Container maxWidth="lg">
 				<Grid container spacing={0} sx={{ flexDirection: { xs: "column", md: "unset" } }}>
 					<Grid size={{ xs: 12, md: 7 }}>
@@ -78,7 +78,7 @@ const Hero = () => {
 					</Grid>
 					<Grid size={{ xs: 12, md: 5 }} sx={{ position: "relative" }}>
 						<Box sx={{ lineHeight: 0 }}>
-							<Image src="/images/backgrounds/landing-bg.svg" width={575} height={587} alt="Hero img" style={{ maxWidth: "100%", height: "auto" }} />
+							<Image src="/images/backgrounds/landing-bg.svg" width={575} height={587} alt="Hero img" style={{ maxWidth: "100%", height: "auto" }} priority />
 						</Box>
 					</Grid>
 				</Grid>

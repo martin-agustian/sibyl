@@ -24,11 +24,16 @@ const ReadMoreText = ({ text, maxChars = 100, sxButton, onClickReadmore, ...rest
 
 	return (
 		<Box {...rest} component="span">
-			{expanded ? text : `${text.slice(0, maxChars)}... `}
+			{expanded ? `${text} ` : `${text.slice(0, maxChars)}... `}
 			<Button 
-        variant="text" size="small" 
-        onClick={(e) => { e.stopPropagation(); toggleExpanded() }} 
-        sx={{ minWidth: "unset", p: 0, ...sxButton }}
+        variant="text" size="small" disableRipple
+        onClick={(e) => { e.stopPropagation(); toggleExpanded(); }} 
+        sx={{ 
+					minWidth: "unset", 
+					lineHeight: "unset", 
+					p: 0, 
+					...sxButton 
+				}}
       >
 				{expanded ? "Read less" : "Read more"}
 			</Button>

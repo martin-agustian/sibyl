@@ -17,6 +17,7 @@ import Logo from "@/components/Logo";
 import AuthLogin from "./components/AuthLogin";
 
 import { UserRole } from "@/commons/type";
+import { UserRoleEnum } from "@/commons/enum";
 
 const Login = () => {
 	const searchParams = useSearchParams();
@@ -39,6 +40,9 @@ const Login = () => {
 	const handleSubmit = async (data: LoginSchema) => {
 		try {
 			setLoadingSubmit(true);
+
+			const clientDashboard = process.env.NEXT_PUBLIC_DASHBOARD_CLIENT_PATH ?? "/";
+			const lawyerDashboard = process.env.NEXT_PUBLIC_DASHBOARD_LAWYER_PATH ?? "/";
 	
 			const response = await signIn("credentials", {
 				email: data.email,
@@ -56,8 +60,8 @@ const Login = () => {
 				});
 	
 				window.location.href = 
-					callbackUrl ?? userRole == "CLIENT" ? 
-						"/client/dashboard" : "/lawyer/marketplace";
+					callbackUrl ?? userRole == UserRoleEnum.CLIENT ? 
+						clientDashboard : lawyerDashboard;
 			} else {
 				throw new Error(response?.error ?? "");
 			}

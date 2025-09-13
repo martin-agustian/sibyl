@@ -265,7 +265,7 @@ const CaseDetail = () => {
               Files
             </Typography>
             {loading ? (
-              <Typography variant="body1">-</Typography>
+              <Typography variant="body1">loading...</Typography>
             ) : (
               caseData?.files && caseData.files.length > 0 ? (
                 <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />

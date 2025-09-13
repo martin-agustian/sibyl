@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 
 const Testimony = () => {
 	return (
-		<Box id="testimonial" sx={{ py: { xs: 5, md: 8 } }}>
+		<Box sx={{ py: { xs: 5, md: 8 } }}>
 			<Container>
 				<Grid container spacing={5}>
 					<Grid size={{ xs: 12, md: 4 }}>

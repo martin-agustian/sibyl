@@ -38,7 +38,7 @@ export const data: Data[] = [
 
 const Feature = () => {
 	return (
-		<Box id="feature" sx={{ py: { xs: 5, md: 8 }, backgroundColor: "background.paper" }}>
+		<Box sx={{ py: { xs: 5, md: 8 }, backgroundColor: "background.paper" }}>
 			<Container>
 				<Grid container spacing={3}>
 					<Grid size={{ xs: 12 }}>
