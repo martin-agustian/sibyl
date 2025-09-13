@@ -2,25 +2,29 @@ import { ReactNode } from "react";
 
 import { Box, Typography, Button, Stack } from "@mui/material";
 
-import Link from "next/link";
 import InputText from "@/components/form/InputText";
-
-import { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
-import { LoginSchema } from "@/schemas/auth/loginSchema";
 import InputSelect from "@/components/form/InputSelect";
+
+import { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { RegisterSchema } from "@/schemas/auth/registerSchema";
+import { roleOptions } from "@/commons/options";
 
 interface loginType {
   title?: string;
   subtitle?: ReactNode;
   subtext?: ReactNode;
-  register: UseFormRegister<LoginSchema>;
-  errors?: FieldErrors<LoginSchema>;
+  register: UseFormRegister<RegisterSchema>;
+  controlRegister: Control<any>;
+  errors?: FieldErrors<RegisterSchema>;
   loadingSubmit: boolean;
-  onSubmit: UseFormHandleSubmit<LoginSchema>;
-  handleSubmit: (data: LoginSchema) => Promise<void>;  
+  onSubmit: UseFormHandleSubmit<RegisterSchema>;
+  handleSubmit: (data: RegisterSchema) => Promise<void>;  
 }
 
-const AuthRegister = ({ title, subtitle, subtext, register, errors, loadingSubmit, handleSubmit, onSubmit }: loginType) => (
+const AuthRegister = ({ 
+  title, subtitle, subtext, register, controlRegister, 
+  errors, loadingSubmit, handleSubmit, onSubmit 
+}: loginType) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -105,7 +109,7 @@ const AuthRegister = ({ title, subtitle, subtext, register, errors, loadingSubmi
         </Box>
         <Box sx={{ marginTop: "15px" }}>
           <Typography
-            htmlFor="password"
+            htmlFor="account-type"
             component="label"
             variant="subtitle1"
             sx={{
@@ -115,12 +119,12 @@ const AuthRegister = ({ title, subtitle, subtext, register, errors, loadingSubmi
           >
             Account Type
           </Typography>
-          
-          {/* <InputSelect id="category" placeholder="Select Category" items={lawCategoryOptions} defaultValue={""} {...registerFilter("category")} /> */}
 
-          {errors?.password?.message && (
+          <InputSelect id="account-type" placeholder="Select Account Type" control={controlRegister} name="role" items={roleOptions} />        
+
+          {errors?.role?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
-              {errors.password.message}
+              {errors.role.message}
             </Typography>
           )}
         </Box>
@@ -137,11 +141,11 @@ const AuthRegister = ({ title, subtitle, subtext, register, errors, loadingSubmi
             Jurisdiction
           </Typography>
           
-          <InputText id="jurisdiction" fullWidth variant="outlined" size="small" placeholder="Enter Jurisdiction" {...register("email")} />
+          <InputText id="jurisdiction" fullWidth variant="outlined" size="small" placeholder="Enter Jurisdiction" {...register("jurisdiction")} />
           
-          {errors?.email?.message && (
+          {errors?.jurisdiction?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
-              {errors.email.message}
+              {errors.jurisdiction.message}
             </Typography>
           )}
         </Box>
@@ -158,11 +162,11 @@ const AuthRegister = ({ title, subtitle, subtext, register, errors, loadingSubmi
             Bar Number
           </Typography>
           
-          <InputText id="bar-number" fullWidth variant="outlined" size="small" placeholder="Enter Bar Number" {...register("email")} />
+          <InputText id="bar-number" fullWidth variant="outlined" size="small" placeholder="Enter Bar Number" {...register("barNumber")} />
           
-          {errors?.email?.message && (
+          {errors?.barNumber?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
-              {errors.email.message}
+              {errors.barNumber.message}
             </Typography>
           )}
         </Box>

@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, LoginSchema } from "@/schemas/auth/loginSchema";
 import { signIn, useSession } from "next-auth/react";
 
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
@@ -18,6 +17,7 @@ import AuthRegister from "./components/AuthRegister";
 
 import { UserRole } from "@/commons/type";
 import { UserRoleEnum } from "@/commons/enum";
+import { registerSchema, RegisterSchema } from "@/schemas/auth/registerSchema";
 
 const Register = () => {
 	const searchParams = useSearchParams();
@@ -29,15 +29,24 @@ const Register = () => {
 	const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
 
 	const {
-		register: registerLogin,
-		handleSubmit: onSubmitLogin,
-		formState: { errors: loginErrors },
-	} = useForm<LoginSchema>({
-		resolver: zodResolver(loginSchema),
+		register: register,
+    control: controlRegister,
+		handleSubmit: onSubmitRegister,
+		formState: { errors: registerErrors },
+	} = useForm<RegisterSchema>({
+		resolver: zodResolver(registerSchema),
 		mode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: UserRoleEnum.CLIENT,
+      jurisdiction: "",
+      barNumber: "",
+    }
 	});
 
-	const handleSubmit = async (data: LoginSchema) => {
+	const handleSubmit = async (data: RegisterSchema) => {
 		try {
 			setLoadingSubmit(true);
 
@@ -143,11 +152,12 @@ const Register = () => {
 										</Typography>
 									</Stack>
 								}
-								register={registerLogin}
-								errors={loginErrors}
+								register={register}
+                controlRegister={controlRegister}
+								errors={registerErrors}
 								loadingSubmit={loadingSubmit}
 								handleSubmit={handleSubmit}
-								onSubmit={onSubmitLogin}
+								onSubmit={onSubmitRegister}
 							/>
 						</Card>
 					</Grid>

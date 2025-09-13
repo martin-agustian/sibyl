@@ -22,7 +22,7 @@ export async function middleware(req: NextRequest) {
 			}
 		}
 		else { // has no token
-			if (!pathname.startsWith("/login") && pathname !== "/") {
+			if (!pathname.startsWith("/login") && !pathname.startsWith("/register") && pathname !== "/") {
 				return NextResponse.redirect(new URL("/login", req.url));
 			}
 		}

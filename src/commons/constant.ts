@@ -1,6 +1,6 @@
 import { QuoteStatus } from "@prisma/client";
-import { CaseStatus, MuiColor } from "./type";
-import { CaseStatusEnum, QuoteStatusEnum } from "./enum";
+import { CaseStatus, MuiColor, UserRole } from "./type";
+import { CaseStatusEnum, QuoteStatusEnum, UserRoleEnum } from "./enum";
 
 export const LAW_CATEGORIES: { label: string; value: string }[] = [
 	{ label: "Criminal Law", value: "criminal-law" },
@@ -13,6 +13,11 @@ export const LAW_CATEGORIES: { label: string; value: string }[] = [
 	{ label: "Environmental Law", value: "environmental-law" },
 	{ label: "Immigration Law", value: "immigration-law" },
 	{ label: "Labor and Employment Law", value: "labor-employment-law" },
+];
+
+export const USER_ROLE: { label: string; value: UserRole }[] = [
+	{ label: "Client", value: UserRoleEnum.CLIENT },
+	{ label: "Lawyer", value: UserRoleEnum.LAWYER },
 ];
 
 export const CASE_COLOR_STATUS: { value: CaseStatus; color: MuiColor }[] = [
