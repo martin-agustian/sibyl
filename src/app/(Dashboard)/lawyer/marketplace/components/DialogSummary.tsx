@@ -15,9 +15,10 @@ import { CaseModel } from "@/types/model/Case";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuotes";
+import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuoteSchema";
 
 import { getCaseCategoryLabel } from "@/commons/helper";
+import { UpsertQuoteBody } from "@/types/request/Quote";
 
 type DialogSummaryProps = {
 	caseId: string;
@@ -77,16 +78,18 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
     try {
 			setLoadingSubmit(true);
 
+			const body: UpsertQuoteBody = {
+				amount: Number(data.amount),
+				expectedDays: Number(data.expectedDays),
+				note: data.note,
+			};
+
 			const response = await fetch(`/api/lawyer/marketplace/cases/${caseId}/quotes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          amount: Number(data.amount),
-          expectedDays: Number(data.expectedDays),
-          note: data.note,
-        }),
+        body: JSON.stringify(body),
       });
 			const responseData = await response.json();
 

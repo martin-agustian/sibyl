@@ -8,13 +8,16 @@ import InputSelect from "@/components/form/InputSelect";
 import { Control, FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { RegisterSchema } from "@/schemas/auth/registerSchema";
 import { roleOptions } from "@/commons/options";
+import { UserRole } from "@/commons/type";
+import { UserRoleEnum } from "@/commons/enum";
 
-interface loginType {
+type AuthRegisterProps = {
   title?: string;
   subtitle?: ReactNode;
   subtext?: ReactNode;
   register: UseFormRegister<RegisterSchema>;
   controlRegister: Control<any>;
+  selectedRole: UserRole;
   errors?: FieldErrors<RegisterSchema>;
   loadingSubmit: boolean;
   onSubmit: UseFormHandleSubmit<RegisterSchema>;
@@ -22,9 +25,9 @@ interface loginType {
 }
 
 const AuthRegister = ({ 
-  title, subtitle, subtext, register, controlRegister, 
+  title, subtitle, subtext, selectedRole, register, controlRegister, 
   errors, loadingSubmit, handleSubmit, onSubmit 
-}: loginType) => (
+}: AuthRegisterProps) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
@@ -49,7 +52,8 @@ const AuthRegister = ({
             Name
           </Typography>
           
-          <InputText id="name" fullWidth variant="outlined" size="small" placeholder="Enter Name" {...register("email")} />
+          <InputText id="name" fullWidth variant="outlined" size="small" 
+            placeholder="Enter Name" {...register("email")} />
           
           {errors?.email?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
@@ -70,7 +74,8 @@ const AuthRegister = ({
             Email
           </Typography>
           
-          <InputText id="email" fullWidth variant="outlined" size="small" placeholder="Enter Email" {...register("email")} />
+          <InputText id="email" fullWidth variant="outlined" size="small" 
+            placeholder="Enter Email" {...register("email")} />
           
           {errors?.email?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
@@ -120,7 +125,8 @@ const AuthRegister = ({
             Account Type
           </Typography>
 
-          <InputSelect id="account-type" placeholder="Select Account Type" control={controlRegister} name="role" items={roleOptions} />        
+          <InputSelect id="account-type" placeholder="Select Account Type" 
+            control={controlRegister} name="role" items={roleOptions} />        
 
           {errors?.role?.message && (
             <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
@@ -128,48 +134,54 @@ const AuthRegister = ({
             </Typography>
           )}
         </Box>
-        <Box sx={{ marginTop: "15px" }}>
-          <Typography
-            htmlFor="jurisdiction"
-            component="label"
-            variant="subtitle1"
-            sx={{
-              fontWeight: 600,
-              marginBottom: "5px",
-            }}
-          >
-            Jurisdiction
-          </Typography>
-          
-          <InputText id="jurisdiction" fullWidth variant="outlined" size="small" placeholder="Enter Jurisdiction" {...register("jurisdiction")} />
-          
-          {errors?.jurisdiction?.message && (
-            <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
-              {errors.jurisdiction.message}
-            </Typography>
-          )}
-        </Box>
-        <Box sx={{ marginTop: "15px" }}>
-          <Typography
-            htmlFor="bar-number"
-            component="label"
-            variant="subtitle1"
-            sx={{
-              fontWeight: 600,
-              marginBottom: "5px",
-            }}
-          >
-            Bar Number
-          </Typography>
-          
-          <InputText id="bar-number" fullWidth variant="outlined" size="small" placeholder="Enter Bar Number" {...register("barNumber")} />
-          
-          {errors?.barNumber?.message && (
-            <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
-              {errors.barNumber.message}
-            </Typography>
-          )}
-        </Box>
+        {selectedRole === UserRoleEnum.LAWYER && (
+          <>
+            <Box sx={{ marginTop: "15px" }}>
+              <Typography
+                htmlFor="jurisdiction"
+                component="label"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 600,
+                  marginBottom: "5px",
+                }}
+              >
+                Jurisdiction
+              </Typography>
+              
+              <InputText id="jurisdiction" fullWidth variant="outlined" size="small" 
+                placeholder="Enter Jurisdiction" {...register("jurisdiction")} />
+              
+              {errors?.jurisdiction?.message && (
+                <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
+                  {errors.jurisdiction.message}
+                </Typography>
+              )}
+            </Box>
+            <Box sx={{ marginTop: "15px" }}>
+              <Typography
+                htmlFor="bar-number"
+                component="label"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 600,
+                  marginBottom: "5px",
+                }}
+              >
+                Bar Number
+              </Typography>
+              
+              <InputText id="bar-number" fullWidth variant="outlined" size="small" 
+                placeholder="Enter Bar Number" {...register("barNumber")} />
+              
+              {errors?.barNumber?.message && (
+                <Typography variant="caption" color="error" sx={{ marginTop: "5px" }}>
+                  {errors.barNumber.message}
+                </Typography>
+              )}
+            </Box>
+          </>
+        )}
       </Stack>
       <Box sx={{ marginTop: "25px" }}>
         <Button

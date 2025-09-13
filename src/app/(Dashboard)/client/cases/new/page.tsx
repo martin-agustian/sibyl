@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addCasesSchema, AddCasesSchema } from "@/schemas/cases/addCases";
+import { addCasesSchema, AddCasesSchema } from "@/schemas/cases/addCasesSchema";
 
 import { Box, Button, Grid } from "@mui/material";
 

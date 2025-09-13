@@ -7,7 +7,7 @@ import PageContainer from "@/app/(Dashboard)/components/container/PageContainer"
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
 
 import { Grid } from "@mui/system";
-import { Chip, Divider, Typography } from "@mui/material";
+import { Chip, Typography } from "@mui/material";
 
 import { NotificationModel } from "@/types/model/Notification";
 

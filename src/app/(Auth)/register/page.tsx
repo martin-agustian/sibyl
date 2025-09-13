@@ -2,11 +2,10 @@
 import Swal from "sweetalert2";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn, useSession } from "next-auth/react";
 
 import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 
@@ -15,16 +14,12 @@ import PageContainer from "@/app/(Dashboard)/components/container/PageContainer"
 import Logo from "@/components/Logo";
 import AuthRegister from "./components/AuthRegister";
 
-import { UserRole } from "@/commons/type";
 import { UserRoleEnum } from "@/commons/enum";
 import { registerSchema, RegisterSchema } from "@/schemas/auth/registerSchema";
+import { RegisterBody } from "@/types/request/auth";
 
 const Register = () => {
-	const searchParams = useSearchParams();
-	const callbackUrl = searchParams.get("callbackUrl") || "/";
-
-	const { data: session } = useSession();
-	const userRole = session?.user.role as UserRole;
+  const router = useRouter();
 
 	const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
 
@@ -33,6 +28,7 @@ const Register = () => {
     control: controlRegister,
 		handleSubmit: onSubmitRegister,
 		formState: { errors: registerErrors },
+    watch: registerWatch,
 	} = useForm<RegisterSchema>({
 		resolver: zodResolver(registerSchema),
 		mode: "onChange",
@@ -46,38 +42,48 @@ const Register = () => {
     }
 	});
 
+  const selectedRole = registerWatch("role");
+
 	const handleSubmit = async (data: RegisterSchema) => {
 		try {
 			setLoadingSubmit(true);
 
-			const clientDashboard = process.env.NEXT_PUBLIC_DASHBOARD_CLIENT_PATH ?? "/";
-			const lawyerDashboard = process.env.NEXT_PUBLIC_DASHBOARD_LAWYER_PATH ?? "/";
+      const body: RegisterBody = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role
+      };
+      if (data.role === UserRoleEnum.LAWYER) {
+        body.jurisdiction = data.jurisdiction;
+        body.barNumber = data.jurisdiction;
+      }
 	
-			const response = await signIn("credentials", {
-				email: data.email,
-				password: data.password,
-				redirect: false,
-			});
+			const response = await fetch(`/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+			const responseData = await response.json();
 	
 			if (response?.ok) {
 				await Swal.fire({
 					timer: 3000,
 					title: "Success!",
-					text: "Success login",
+					text: "Success create a new account",
 					icon: "success",
 					showConfirmButton: false,
 				});
 	
-				window.location.href = 
-					callbackUrl ?? userRole == UserRoleEnum.CLIENT ? 
-						clientDashboard : lawyerDashboard;
+				router.push("/login");
 			} else {
-				throw new Error(response?.error ?? "");
+				throw new Error(responseData?.error ?? "");
 			}
 	
 			setLoadingSubmit(false);
-		} 
-		catch (error) {
+		} catch (error) {
 			setLoadingSubmit(false);
 
 			await Swal.fire({
@@ -137,10 +143,10 @@ const Register = () => {
 											marginTop: 3,
 										}}>
 										<Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 500 }}>
-											New to Sibyl ?
+											Has an account ?
 										</Typography>
 										<Typography
-											href="/register"
+											href="/login"
 											component={Link}
 											variant="subtitle1"
 											sx={{
@@ -148,7 +154,7 @@ const Register = () => {
 												textDecoration: "none",
 												color: "primary.main",
 											}}>
-											Create an account
+											Sign In
 										</Typography>
 									</Stack>
 								}
@@ -156,6 +162,7 @@ const Register = () => {
                 controlRegister={controlRegister}
 								errors={registerErrors}
 								loadingSubmit={loadingSubmit}
+                selectedRole={selectedRole}
 								handleSubmit={handleSubmit}
 								onSubmit={onSubmitRegister}
 							/>

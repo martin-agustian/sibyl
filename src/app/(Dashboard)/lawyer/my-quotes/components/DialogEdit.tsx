@@ -13,7 +13,8 @@ import { QuoteModel } from "@/types/model/Quote";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuotes";
+import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuoteSchema";
+import { UpsertQuoteBody } from "@/types/request/Quote";
 
 type DialogEditProps = {
   caseId: string;
@@ -53,16 +54,18 @@ const DialogEdit = ({ caseId, quote, fetchQuotes, open, setOpenDialog, onDialogC
       
       setLoadingSubmit(true);
 
+      const body: UpsertQuoteBody = {
+        amount: Number(data.amount),
+        expectedDays: Number(data.expectedDays),
+        note: data.note,
+      };
+
       const response = await fetch(`/api/lawyer/marketplace/cases/${caseId}/quotes/${quote?.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          amount: Number(data.amount),
-          expectedDays: Number(data.expectedDays),
-          note: data.note,
-        }),
+        body: JSON.stringify(body),
       });
       const responseData = await response.json();
 

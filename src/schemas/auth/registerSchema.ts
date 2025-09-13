@@ -2,10 +2,10 @@ import { z } from "zod";
 import { UserRoleEnum } from "@/commons/enum";
 
 export const registerSchema = z.object({
-  role: z.enum([UserRoleEnum.CLIENT, UserRoleEnum.LAWYER]),
-  email: z.email("Email not valid"),
+  name: z.string().min(1, "Name cannot be empty"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  name: z.string().min(1, "Name cannot be empty").optional(),
+  email: z.email("Email not valid"),
+  role: z.enum([UserRoleEnum.CLIENT, UserRoleEnum.LAWYER]),
   jurisdiction: z.string().optional(),
   barNumber: z.string().optional(),
 }).superRefine((data, ctx) => {

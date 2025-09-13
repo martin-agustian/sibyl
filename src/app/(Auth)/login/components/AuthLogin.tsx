@@ -8,7 +8,7 @@ import InputText from "@/components/form/InputText";
 import { FieldErrors, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
 import { LoginSchema } from "@/schemas/auth/loginSchema";
 
-interface loginType {
+type AuthLoginProps = {
   title?: string;
   subtitle?: ReactNode;
   subtext?: ReactNode;
@@ -19,7 +19,7 @@ interface loginType {
   handleSubmit: (data: LoginSchema) => Promise<void>;  
 }
 
-const AuthLogin = ({ title, subtitle, subtext, register, errors, loadingSubmit, handleSubmit, onSubmit }: loginType) => (
+const AuthLogin = ({ title, subtitle, subtext, register, errors, loadingSubmit, handleSubmit, onSubmit }: AuthLoginProps) => (
   <>
     {title ? (
       <Typography fontWeight="700" variant="h2" mb={1}>
