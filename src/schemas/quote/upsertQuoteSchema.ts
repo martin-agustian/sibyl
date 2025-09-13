@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const upsertQuoteSchema = z.object({
-  amount: z.string().min(1, "Amount must be at least 1"),
-  expectedDays: z.string().min(1, "Expected Days must be at least 1"),
+  amount: z.number().min(1, "Amount must be at least 1"),
+  expectedDays: z.number().min(1, "Expected Days must be at least 1"),
   note: z.string().min(1, "Note is required"),
 });
 

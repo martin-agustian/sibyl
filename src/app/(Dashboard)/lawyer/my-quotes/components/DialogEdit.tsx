@@ -5,9 +5,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Box, Button, Dialog, DialogContent, Grid, Typography } from "@mui/material";
 
 import Label from "@/components/form/Label";
-import InputText from "@/components/form/InputText";
 import HelperTextError from "@/components/form/HelperTextError";
 import InputTextArea from "@/components/form/InputTextArea";
+import InputNumber from "@/components/form/InputNumber";
 
 import { QuoteModel } from "@/types/model/Quote";
 
@@ -43,8 +43,8 @@ const DialogEdit = ({ caseId, quote, fetchQuotes, open, setOpenDialog, onDialogC
   });
 
   useEffect(() => {
-    if (quote?.amount) setValueQuote("amount", quote.amount.toString());
-    if (quote?.expectedDays) setValueQuote("expectedDays", quote.expectedDays.toString());
+    if (quote?.amount) setValueQuote("amount", quote.amount);
+    if (quote?.expectedDays) setValueQuote("expectedDays", quote.expectedDays);
     if (quote?.note) setValueQuote("note", quote.note.toString());
   }, [quote]);
 
@@ -55,8 +55,8 @@ const DialogEdit = ({ caseId, quote, fetchQuotes, open, setOpenDialog, onDialogC
       setLoadingSubmit(true);
 
       const body: UpsertQuoteBody = {
-        amount: Number(data.amount),
-        expectedDays: Number(data.expectedDays),
+        amount: data.amount,
+        expectedDays: data.expectedDays,
         note: data.note,
       };
 
@@ -103,14 +103,14 @@ const DialogEdit = ({ caseId, quote, fetchQuotes, open, setOpenDialog, onDialogC
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 6 }}>
               <Label htmlFor="amount">Amount</Label>
-              <InputText id="amount" type="number" placeholder="Enter Amount" {...registerQuote("amount")} />
+              <InputNumber id="amount" placeholder="Enter Amount" {...registerQuote("amount", { valueAsNumber: true })} />
 
               {caseQuote?.amount?.message && <HelperTextError>{caseQuote.amount.message}</HelperTextError>}
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
               <Label htmlFor="expected-days">Expected Days</Label>
-              <InputText id="expected-days" type="number" placeholder="Enter Expected Days" {...registerQuote("expectedDays")} />
+              <InputNumber id="expected-days" placeholder="Enter Expected Days" {...registerQuote("expectedDays", { valueAsNumber: true })} />
 
               {caseQuote?.expectedDays?.message && <HelperTextError>{caseQuote.expectedDays.message}</HelperTextError>}
             </Grid>

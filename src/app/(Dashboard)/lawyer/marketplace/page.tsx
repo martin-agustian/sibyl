@@ -165,10 +165,8 @@ const Dashboard = () => {
                         setOpenDialogSummary(true);
                       }}
                     >
-                      <TableCell>
-                        <Typography sx={{ textTransform: "capitalize" }}>
-                          {c.title}
-                        </Typography>
+                      <TableCell sx={{ textTransform: "capitalize" }}>
+                        {c.title}
                       </TableCell>
                       <TableCell>
                         {getCaseCategoryLabel(c.category)}

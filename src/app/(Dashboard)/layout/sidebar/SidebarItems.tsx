@@ -5,7 +5,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 
 import { Box } from "@mui/material";
-import { Sidebar as MUI_Sidebar, Menu, MenuItem, Submenu } from "react-mui-sidebar";
+import { Sidebar as SidebarMUI, Menu, MenuItem, Submenu } from "react-mui-sidebar";
 import { IconPoint } from "@tabler/icons-react";
 
 import { getMenuItems } from "./MenuItems";
@@ -53,13 +53,15 @@ const SidebarItems = () => {
 
 	return (
 		<>
-			<MUI_Sidebar width={"100%"} showProfile={false} themeColor={"#5D87FF"} themeSecondaryColor={"#49beff"}>
+			<SidebarMUI width={"100%"} showProfile={false} themeColor={"#5D87FF"} themeSecondaryColor={"#49beff"}>
 				<Box p={3}>
-					<Logo sxText={{ display: "inline" }} />
+					<Link href="/" style={{ textDecoration: "none" }}>
+						<Logo sxText={{ display: "inline" }} />
+					</Link>
 				</Box>
 
 				{renderMenuItems(getMenuItems(userRole), pathDirect)}
-			</MUI_Sidebar>
+			</SidebarMUI>
 		</>
 	);
 };

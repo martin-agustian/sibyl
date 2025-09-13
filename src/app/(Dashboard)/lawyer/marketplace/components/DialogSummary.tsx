@@ -19,6 +19,7 @@ import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuot
 
 import { getCaseCategoryLabel } from "@/commons/helper";
 import { UpsertQuoteBody } from "@/types/request/Quote";
+import InputNumber from "@/components/form/InputNumber";
 
 type DialogSummaryProps = {
 	caseId: string;
@@ -79,8 +80,8 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 			setLoadingSubmit(true);
 
 			const body: UpsertQuoteBody = {
-				amount: Number(data.amount),
-				expectedDays: Number(data.expectedDays),
+				amount: data.amount,
+				expectedDays: data.expectedDays,
 				note: data.note,
 			};
 
@@ -106,7 +107,7 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 			} 
 			else throw new Error(responseData.error);
 
-			setLoadingSubmit(false);			
+			setLoadingSubmit(false);
 		} catch (error) {
 			setLoadingSubmit(false);
 			await Swal.fire({
@@ -177,14 +178,14 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 					<Grid container spacing={3}>
 						<Grid size={{ xs: 12, md: 6 }}>
 							<Label htmlFor="amount">Amount</Label>
-							<InputText id="amount" type="number" placeholder="Enter Amount" {...registerQuote("amount")} />
+							<InputNumber id="amount" placeholder="Enter Amount" {...registerQuote("amount", { valueAsNumber: true })} />
 
 							{caseQuote?.amount?.message && <HelperTextError>{caseQuote.amount.message}</HelperTextError>}
 						</Grid>
 
 						<Grid size={{ xs: 12, md: 6 }}>
 							<Label htmlFor="expected-days">Expected Days</Label>
-							<InputText id="expected-days" type="number" placeholder="Enter Expected Days" {...registerQuote("expectedDays")} />
+							<InputNumber id="expected-days" placeholder="Enter Expected Days" {...registerQuote("expectedDays", { valueAsNumber: true })} />
 
 							{caseQuote?.expectedDays?.message && <HelperTextError>{caseQuote.expectedDays.message}</HelperTextError>}
 						</Grid>
