@@ -257,15 +257,6 @@ const Dashboard = () => {
             >
               Open Quote Note
             </Button>
-            {selectedQuote?.status == QuoteStatusEnum.REJECTED && (
-              <Button
-                fullWidth 
-                variant="outlined" 
-                // onClick={() => setQuoteNoteOpen(true)}
-              >
-                Open Reject Note
-              </Button>
-            )}
           </Stack>
         </DialogContent>
       </Dialog>

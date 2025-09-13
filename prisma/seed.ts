@@ -18,8 +18,6 @@ async function main() {
 			email: "client1@mailinator.com",
 			passwordHash,
 			role: UserRoleEnum.CLIENT,
-			emailVerif: true, // email verified
-			accountVerif: false, // not relevant for client
 		},
 	});
 
@@ -34,8 +32,6 @@ async function main() {
 			role: UserRoleEnum.LAWYER,
 			jurisdiction: "Indonesia",
 			barNumber: "123456",
-			emailVerif: true, // email verified
-			accountVerif: true, // mark as verified lawyer
 		},
 	});
 

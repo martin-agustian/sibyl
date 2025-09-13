@@ -26,8 +26,6 @@ export async function GET(req: Request) {
 					name: true,
 					email: true,
 					role: true,
-					emailVerif: true,
-					accountVerif: true,
 					createdAt: true,
 				},
 				orderBy: { createdAt: "desc" },
