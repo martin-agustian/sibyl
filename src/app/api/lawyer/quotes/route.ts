@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { UserRoleEnum } from "@/commons/enum";
 
 export async function GET(req: Request) {
 	try {
 		const session = await getServerSession(authOptions);
-		if (!session || session.user.role !== "LAWYER") {
+		if (!session || session.user.role !== UserRoleEnum.LAWYER) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 

@@ -1,3 +1,14 @@
-*{
-     font-family: 'Plus Jakarta Sans', Helvetica, Arial, sans-serif !important;
+* {
+	font-family: "Plus Jakarta Sans", Helvetica, Arial, sans-serif !important;
+}
+
+.swal2-container {
+	z-index: 1500;
+}
+
+.swal2-confirm {
+	background-color: #5D87FF;
+}
+.swal2-confirm:hover {
+	background-color: #4570EA;
 }

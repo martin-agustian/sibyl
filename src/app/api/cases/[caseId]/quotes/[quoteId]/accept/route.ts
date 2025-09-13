@@ -1,8 +1,10 @@
+import Stripe from "stripe";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import Stripe from "stripe";
+import { CaseStatusEnum, UserRoleEnum } from "@/commons/enum";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -11,7 +13,7 @@ export async function POST(req: Request, { params }: { params: { caseId: string;
 		const { caseId, quoteId } = await params;
 
 		const session = await getServerSession(authOptions);
-		if (!session || session.user.role !== "CLIENT") {
+		if (!session || session.user.role !== UserRoleEnum.CLIENT) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
@@ -27,7 +29,7 @@ export async function POST(req: Request, { params }: { params: { caseId: string;
 			return NextResponse.json({ error: "Case not found or not owned by you" }, { status: 403 });
 		}
 
-		if (caseData.status !== "OPEN") {
+		if (caseData.status !== CaseStatusEnum.OPEN) {
 			return NextResponse.json({ error: "Case is not open" }, { status: 400 });
 		}
 

@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mailer";
+import { CaseStatusEnum, PaymentStatusEnum, QuoteStatusEnum } from "@/commons/enum";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -30,22 +31,22 @@ export async function POST(req: Request) {
         await prisma.$transaction([
           prisma.quote.update({
             where: { id: payment.quoteId },
-            data: { status: "ACCEPTED" },
+            data: { status: QuoteStatusEnum.ACCEPTED },
           }),
           prisma.quote.updateMany({
             where: { caseId: payment.caseId, id: { not: payment.quoteId } },
             data: { 
-              status: "REJECTED", 
+              status: QuoteStatusEnum.REJECTED, 
               statusNote: "Thank you for your quote. The client has decided to proceed with another provider" 
             },
           }),
           prisma.case.update({
             where: { id: payment.caseId },
-            data: { status: "ENGAGED", lawyerId: payment.lawyerId },
+            data: { status: CaseStatusEnum.ENGAGED, lawyerId: payment.lawyerId },
           }),
           prisma.payment.update({
             where: { id: payment.id },
-            data: { status: "SUCCEEDED" },
+            data: { status: PaymentStatusEnum.SUCCEEDED },
           })
         ]);
 
@@ -119,15 +120,15 @@ export async function POST(req: Request) {
         await prisma.$transaction([
           prisma.payment.update({
             where: { id: payment.id },
-            data: { status: "FAILED" },
+            data: { status: PaymentStatusEnum.FAILED },
           }),
           prisma.case.update({
             where: { id: payment.caseId },
-            data: { status: "OPEN", lawyerId: null },
+            data: { status: CaseStatusEnum.OPEN, lawyerId: null },
           }),
           prisma.quote.update({
             where: { id: payment.quoteId },
-            data: { status: "PROPOSED" },
+            data: { status: QuoteStatusEnum.PROPOSED },
           }),
         ]);
 

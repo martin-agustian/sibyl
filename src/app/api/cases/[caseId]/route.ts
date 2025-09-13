@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { CaseStatusEnum, PaymentStatusEnum, QuoteStatusEnum, UserRoleEnum } from "@/commons/enum";
 
 export async function GET(req: Request, { params }: { params: { caseId: string } }) {
 	try {
@@ -35,14 +36,14 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 		}
 
 		// Access Control
-		if (role === "CLIENT") {
+		if (role === UserRoleEnum.CLIENT) {
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
 			return NextResponse.json(caseData);
 		}
 
-		if (role === "LAWYER") {
+		if (role === UserRoleEnum.LAWYER) {
 			const myQuoteData = await prisma.quote.findFirst({
 				where: { 
 					caseId: caseData.id,
@@ -50,26 +51,26 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 				}
 			});
 
-			if (myQuoteData?.status === "ACCEPTED" && caseData.status === "ENGAGED") {
-				// ✅ cek payment status harus "paid"
+			if (myQuoteData?.status === QuoteStatusEnum.ACCEPTED && caseData.status === CaseStatusEnum.ENGAGED) {
+				// ✅ Check Payment Status must "paid"
 				const payment = await prisma.payment.findFirst({
 					where: {
 						caseId: caseData.id,
 						lawyerId: userId,
-						status: "SUCCEEDED",
+						status: PaymentStatusEnum.SUCCEEDED,
 					},
 				});
 
 				if (payment) {
-					// lawyer accepted + payment sukses → bisa lihat detail lengkap
+					// lawyer accepted + payment success → full detail
 					return NextResponse.json(caseData);
 				} else {
-					// accepted tapi payment belum beres → hide files
+					// accepted but payment not completed → hide files
 					const { files, ...safeCase } = caseData as any;
 					return NextResponse.json(safeCase);
 				}
 			} else {
-				// lawyer lain → case detail tanpa file
+				// anothers lawyer → case detail without files
 				const { files, ...safeCase } = caseData;
 				return NextResponse.json(safeCase);
 			}

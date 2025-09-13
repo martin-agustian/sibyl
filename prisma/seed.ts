@@ -1,5 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { PrismaClient } from "@prisma/client";
+import { UserRoleEnum } from "@/commons/enum";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +17,7 @@ async function main() {
 			name: "Client One",
 			email: "client1@mailinator.com",
 			passwordHash,
-			role: "CLIENT",
+			role: UserRoleEnum.CLIENT,
 			emailVerif: true, // email verified
 			accountVerif: false, // not relevant for client
 		},
@@ -30,7 +31,7 @@ async function main() {
 			name: "Lawyer One",
 			email: "lawyer1@mailinator.com",
 			passwordHash,
-			role: "LAWYER",
+			role: UserRoleEnum.LAWYER,
 			jurisdiction: "Indonesia",
 			barNumber: "123456",
 			emailVerif: true, // email verified

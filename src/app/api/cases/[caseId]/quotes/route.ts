@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { UserRoleEnum } from "@/commons/enum";
 
 export async function GET(req: Request, { params }: { params: { caseId: string } }) {
 	try {
@@ -30,12 +31,12 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 		}
 
 		// 🔒 Access control
-		if (role === "CLIENT") {
+		if (role === UserRoleEnum.CLIENT) {
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
 		} 
-    else if (role !== "LAWYER") {
+    else if (role !== UserRoleEnum.LAWYER) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
@@ -43,7 +44,7 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 		const where: any = { caseId };
 		if (status) where.status = status;
 
-    if (role === "LAWYER") {
+    if (role === UserRoleEnum.LAWYER) {
       where.lawyerId = userId;
     }
 

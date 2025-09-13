@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
+import { UserRoleEnum } from "@/commons/enum";
 
 // config Cloudinary
 cloudinary.v2.config({
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
 	try {
 		const session = await getServerSession(authOptions);
 
-		if (!session || session.user.role !== "CLIENT") {
+		if (!session || session.user.role !== UserRoleEnum.CLIENT) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
 	const session = await getServerSession(authOptions);
-	if (!session || session.user.role !== "CLIENT") {
+	if (!session || session.user.role !== UserRoleEnum.CLIENT) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 

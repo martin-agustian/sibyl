@@ -1,5 +1,6 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+import { UserRoleEnum } from "./commons/enum";
 
 export async function middleware(req: NextRequest) {
 	const pathname = req.nextUrl.pathname;
@@ -12,11 +13,11 @@ export async function middleware(req: NextRequest) {
 				return NextResponse.redirect(new URL("/", req.url));
 			}
 	
-			if (pathname.startsWith("/client") && token.role !== "CLIENT") {
+			if (pathname.startsWith("/client") && token.role !== UserRoleEnum.CLIENT) {
 				return NextResponse.redirect(new URL("/unauthorized", req.url));
 			}
 	
-			if (pathname.startsWith("/lawyer") && token.role !== "LAWYER") {
+			if (pathname.startsWith("/lawyer") && token.role !== UserRoleEnum.LAWYER) {
 				return NextResponse.redirect(new URL("/unauthorized", req.url));
 			}
 		}

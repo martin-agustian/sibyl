@@ -2,6 +2,7 @@ import { uniqueId } from "lodash";
 import { IconChecklist, IconLayoutDashboard } from "@tabler/icons-react";
 
 import { UserRole } from "@/commons/type";
+import { UserRoleEnum } from "@/commons/enum";
 
 export const getMenuItems = (role: UserRole) => {
   const menu = [
@@ -13,11 +14,11 @@ export const getMenuItems = (role: UserRole) => {
       id: uniqueId(),
       title: "Dashboard",
       icon: IconLayoutDashboard,
-      href: role === "CLIENT" ? "/client/dashboard" : "/lawyer/marketplace",
+      href: role === UserRoleEnum.CLIENT ? "/client/dashboard" : "/lawyer/marketplace",
     },
   ];
 
-  if (role === "LAWYER") {
+  if (role === UserRoleEnum.LAWYER) {
     menu.push({
       id: uniqueId(),
       title: "My Quotes",

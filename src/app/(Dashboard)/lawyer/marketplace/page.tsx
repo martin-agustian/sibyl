@@ -197,6 +197,7 @@ const Dashboard = () => {
 
       <DialogSummary 
         open={openDialogSummary} 
+        setOpenDialogSummary={setOpenDialogSummary}
         onDialogClose={() => setOpenDialogSummary(false)} 
         caseId={selectedCaseId}
       />

@@ -15,3 +15,9 @@ export enum QuoteStatusEnum {
   ACCEPTED = "ACCEPTED",
   REJECTED = "REJECTED",
 }
+
+export enum PaymentStatusEnum {
+  PENDING = "PENDING",
+  SUCCEEDED = "SUCCEEDED",
+  FAILED = "FAILED",
+}

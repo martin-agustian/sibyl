@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendMail } from "@/lib/mailer";
+import { CaseStatusEnum, QuoteStatusEnum, UserRoleEnum } from "@/commons/enum";
 
 export async function POST(req: Request, { params }: { params: { caseId: string } }) {
 	try {
 		const session = await getServerSession(authOptions);
-		if (!session || session.user.role !== "LAWYER") {
+		if (!session || session.user.role !== UserRoleEnum.LAWYER) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 		const lawyerId = session.user.id;
@@ -20,17 +21,17 @@ export async function POST(req: Request, { params }: { params: { caseId: string 
 			return NextResponse.json({ error: "Amount and expectedDays are required" }, { status: 400 });
 		}
 
-		// ✅ Check case masih OPEN
+		// Check if still OPEN
 		const caseData = await prisma.case.findUnique({
 			where: { id: caseId },
       include: { client: true }
 		});
 
-		if (!caseData || caseData.status !== "OPEN") {
+		if (!caseData || caseData.status !== CaseStatusEnum.OPEN) {
 			return NextResponse.json({ error: "Case not found or not open" }, { status: 400 });
 		}
 
-		// ✅ Cek lawyer sudah submit quote sebelumnya
+		// Check lawyer already submitted
 		const existingQuote = await prisma.quote.findFirst({
 			where: { caseId, lawyerId },
 		});
@@ -39,7 +40,7 @@ export async function POST(req: Request, { params }: { params: { caseId: string 
 			return NextResponse.json({ error: "You already submitted a quote for this case" }, { status: 400 });
 		}
 
-		// ✅ Simpan quote baru
+		// Save new quote
 		const newQuote = await prisma.quote.create({
 			data: {
 				caseId,
@@ -47,7 +48,7 @@ export async function POST(req: Request, { params }: { params: { caseId: string 
 				amount,
 				expectedDays,
 				note: note || "",
-				status: "PROPOSED",
+				status: QuoteStatusEnum.PROPOSED,
 			},
 		});
 
@@ -76,26 +77,27 @@ export async function POST(req: Request, { params }: { params: { caseId: string 
 export async function PATCH(req: Request, { params }: { params: { caseId: string; quoteId: string } }) {
 	try {
 		const session = await getServerSession(authOptions);
-		if (!session || session.user.role !== "LAWYER") {
+		if (!session || session.user.role !== UserRoleEnum.LAWYER) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
 		const lawyerId = session.user.id;
 		const { caseId, quoteId } = params;
+
 		const body = await req.json();
 		const { amount, expectedDays, note } = body;
 
-		// ✅ check case masih OPEN
+		// Check if still OPEN
 		const caseData = await prisma.case.findUnique({
 			where: { id: caseId },
 			select: { status: true },
 		});
 
-		if (!caseData || caseData.status !== "OPEN") {
+		if (!caseData || caseData.status !== CaseStatusEnum.OPEN) {
 			return NextResponse.json({ error: "Case not found or not open" }, { status: 400 });
 		}
 
-		// ✅ check quote milik lawyer ini
+		// Check for quotes submitted by this lawyer
 		const quote = await prisma.quote.findUnique({
 			where: { id: quoteId },
 		});
@@ -104,11 +106,11 @@ export async function PATCH(req: Request, { params }: { params: { caseId: string
 			return NextResponse.json({ error: "Quote not found or not owned by you" }, { status: 403 });
 		}
 
-		if (quote.status !== "PROPOSED") {
+		if (quote.status !== QuoteStatusEnum.PROPOSED) {
 			return NextResponse.json({ error: "Quote cannot be updated after it is accepted/rejected" }, { status: 400 });
 		}
 
-		// ✅ update quote
+		// Update quote
 		const updatedQuote = await prisma.quote.update({
 			where: { id: quoteId },
 			data: {

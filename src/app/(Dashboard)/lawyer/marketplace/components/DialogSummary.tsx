@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { Box, Button, Dialog, DialogContent, Divider, Grid, Typography } from "@mui/material";
 
@@ -22,10 +22,11 @@ import ReadMoreText from "@/components/text/ReadMoreText";
 type DialogSummaryProps = {
 	caseId: string;
 	open: boolean;
+	setOpenDialogSummary: Dispatch<SetStateAction<boolean>>;
 	onDialogClose: () => void;
 };
 
-const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
+const DialogSummary = ({ caseId, open, setOpenDialogSummary, onDialogClose }: DialogSummaryProps) => {
 	const [caseData, setCaseData] = useState<CaseModel>();
 
 	const [loading, setLoading] = useState<boolean>(true);
@@ -58,7 +59,6 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 
 			setLoading(false);
 		} catch (error) {
-
 			setLoading(false);
 			await Swal.fire({
 				title: "Error!",
@@ -91,13 +91,14 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 
 			if (response.ok) {
 				setCaseData(responseData);
+				setOpenDialogSummary(false);
+				fetchCase();
 			} 
 			else throw new Error(responseData.error);
 
-			setLoadingSubmit(false);
+			setLoadingSubmit(false);			
 		} catch (error) {
 			setLoadingSubmit(false);
-
 			await Swal.fire({
 				title: "Error!",
 				icon: "error",

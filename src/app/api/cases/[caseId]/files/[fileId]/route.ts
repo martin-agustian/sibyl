@@ -1,8 +1,10 @@
+import cloudinary from "cloudinary";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import cloudinary from "cloudinary";
+import { CaseStatusEnum, PaymentStatusEnum, QuoteStatusEnum, UserRoleEnum } from "@/commons/enum";
 
 // Config Cloudinary
 cloudinary.v2.config({
@@ -35,23 +37,23 @@ export async function GET(req: Request, { params }: { params: { caseId: string; 
 		const caseData = file.case;
 
 		// 🔒 Access Control
-		if (role === "CLIENT") {
+		if (role === UserRoleEnum.CLIENT) {
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
 		} 
-		else if (role === "LAWYER") {
+		else if (role === UserRoleEnum.LAWYER) {
 			const myQuote = caseData.quotes.find((q) => q.lawyerId === userId);
-			if (!(myQuote?.status === "ACCEPTED" && caseData.status === "ENGAGED")) {
+			if (!(myQuote?.status === QuoteStatusEnum.ACCEPTED && caseData.status === CaseStatusEnum.ENGAGED)) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
 
-			// ✅ cek payment harus paid
+			// Check Payment must paid
 			const payment = await prisma.payment.findFirst({
 				where: {
 					caseId: caseData.id,
 					lawyerId: userId,
-					status: "SUCCEEDED",
+					status: PaymentStatusEnum.SUCCEEDED,
 				},
 			})
 
@@ -68,11 +70,11 @@ export async function GET(req: Request, { params }: { params: { caseId: string; 
 
 		// ✅ Generate signed URL (short-lived)
 		const signedUrl = cloudinary.v2.utils.private_download_url(
-			file.storagePath, // public_id (bukan secure_url)
+			file.storagePath, // public_id (not secure_url)
 			file.mimeType.includes("pdf") ? "pdf" : "jpg", // resource type
 			{
 				type: "authenticated",
-				expires_at: Math.floor(Date.now() / 1000) + 60 * 5, // 5 menit
+				expires_at: Math.floor(Date.now() / 1000) + 60 * 5, // 5 minutes
 			}
 		);
 
