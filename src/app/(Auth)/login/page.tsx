@@ -1,7 +1,7 @@
 "use client";
 import Swal from "sweetalert2";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
@@ -9,7 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginSchema } from "@/schemas/auth/loginSchema";
 import { signIn } from "next-auth/react";
 
-import { Grid, Box, Card, Stack, Typography } from "@mui/material";
+import { Grid, Box, Card, Stack, Typography, Divider, Button } from "@mui/material";
+import { IconBrandGoogleFilled } from "@tabler/icons-react";
 
 import Link from "next/link";
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
@@ -18,6 +19,7 @@ import AuthLogin from "./components/AuthLogin";
 
 const Login = () => {
 	const searchParams = useSearchParams();
+	const errorMessage = searchParams.get("error") || "";
 	const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
 	const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
@@ -30,6 +32,16 @@ const Login = () => {
 		resolver: zodResolver(loginSchema),
 		mode: "onChange",
 	});
+
+	useEffect(() => {
+		if (errorMessage) {
+			Swal.fire({
+				title: "Error!",
+				html: errorMessage,
+				icon: "error",
+			});
+		}
+	}, [errorMessage])
 
 	const handleSubmit = async (data: LoginSchema) => {
 		try {
@@ -138,6 +150,32 @@ const Login = () => {
 								handleSubmit={handleSubmit}
 								onSubmit={onSubmitLogin}
 							/>
+
+							<Divider sx={{ my: 4 }}>OR</Divider>
+
+							<Button
+								onClick={() => signIn("google")}
+								variant="outlined"
+								startIcon={<IconBrandGoogleFilled />}
+								fullWidth
+								sx={{
+									textTransform: "none",
+									color: "rgba(0, 0, 0, 0.6)",
+									borderColor: "rgba(0, 0, 0, 0.6)",
+									fontWeight: 500,
+									"&:hover": {
+										backgroundColor: "#F5F5F5",
+										borderColor: "#AAAAAA",
+									},
+								}}
+							>
+								Sign in with Google
+							</Button>
+
+							<Typography sx={{ fontSize: "12px", color: "grey", mt: 1.5 }}>
+								In the future when login with gmail and email is not found,
+								new account automatically created.
+							</Typography>
 						</Card>
 					</Grid>
 				</Grid>

@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/lib/prisma";
 
 import { NextAuthOptions } from "next-auth";
@@ -35,21 +36,33 @@ export const authOptions: NextAuthOptions = {
 					role: user.email === process.env.ADMIN_EMAIL ? UserRoleEnum.ADMIN : user.role,
 					jurisdiction: user.jurisdiction,
 					barNumber: user.barNumber,
-					emailVerif: user.emailVerif,
-					accountVerif: user.accountVerif,
 				};
 			},
 		}),
+		GoogleProvider({
+			clientId: process.env.GOOGLE_CLIENT_ID!,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+		}),
 	],
 	callbacks: {
+		async signIn({ user, account }) {
+			if (account?.provider === "google") {
+				const existingUser = await prisma.user.findUnique({ where: { email: user.email! } });
+				if (!existingUser) {
+					throw new Error(`No account found for ${user.email}. Please register first using this email before trying to sign in.`);
+				}
+
+				user.id = existingUser.id;
+				user.role = existingUser.email === process.env.ADMIN_EMAIL ? "ADMIN" : existingUser.role;
+			}
+			return true;
+		},
 		async jwt({ token, user }) {
 			if (user) {
 				token.id = user.id;
 				token.role = user.role;
 				token.email = user.email;
 				token.name = user.name;
-				token.emailVerif = user.emailVerif;
-				token.accountVerif = user.accountVerif;
 			}
 			return token;
 		},
@@ -59,14 +72,13 @@ export const authOptions: NextAuthOptions = {
 				session.user.role = token.role as string;
 				session.user.email = token.email as string;
 				session.user.name = token.name as string;
-				session.user.emailVerif = token.emailVerif as boolean;
-				session.user.accountVerif = token.accountVerif as boolean;
 			}
 			return session;
 		},
 	},
 	pages: {
-		signIn: "/login", // custom login page
+		signIn: "/login",
+		error: "/login",
 	},
 	secret: process.env.NEXTAUTH_SECRET,
 };

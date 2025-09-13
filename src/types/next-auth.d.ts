@@ -7,8 +7,6 @@ declare module "next-auth" {
 			name: string;
 			email: string;
 			role: string;
-			emailVerif: boolean;
-			accountVerif: boolean;
 		};
 	}
 	interface User {
@@ -16,8 +14,6 @@ declare module "next-auth" {
 		name: string;
 		email: string;
 		role: string;
-		emailVerif: boolean;
-		accountVerif: boolean;
 	}
 }
 
@@ -27,7 +23,5 @@ declare module "next-auth/jwt" {
 		name: string;
 		email: string;
 		role: string;
-		emailVerif: boolean;
-		accountVerif: boolean;
 	}
 }
