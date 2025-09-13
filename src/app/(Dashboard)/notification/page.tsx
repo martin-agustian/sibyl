@@ -79,7 +79,8 @@ export const Notification = () => {
 										sx={{ justifyContent: "space-between" }}
 									>
 										<Box>
-											<Chip label={n.type} size="small" />
+											<Chip label={n.type} size="small" 
+												sx={{ fontSize: "12px", fontWeight: "bold" }} />
 											<Typography variant="body1" sx={{ marginTop: 1 }}>
 												{n.message}
 											</Typography>

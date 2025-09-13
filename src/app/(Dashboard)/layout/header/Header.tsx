@@ -1,5 +1,4 @@
-import React from "react";
-
+import { MouseEvent } from "react";
 import PropTypes from "prop-types";
 
 import { Box, AppBar, Toolbar, styled, Stack, IconButton, Badge } from "@mui/material";
@@ -9,7 +8,7 @@ import Link from "next/link";
 import Profile from "./Profile";
 
 interface ItemType {
-	toggleMobileSidebar: (event: React.MouseEvent<HTMLElement>) => void;
+	toggleMobileSidebar: (event: MouseEvent<HTMLElement>) => void;
 }
 
 const Header = ({ toggleMobileSidebar }: ItemType) => {
@@ -48,9 +47,7 @@ const Header = ({ toggleMobileSidebar }: ItemType) => {
 
 				<Link href="/notification">
 					<IconButton size="large" color="inherit" aria-label="show notifications" aria-controls="msgs-menu" aria-haspopup="true">
-						<Badge variant="dot" color="primary">
-							<IconBellRinging size="21" stroke="1.5" />
-						</Badge>
+						<IconBellRinging size="21" stroke="1.5" />
 					</IconButton>
 				</Link>
 
