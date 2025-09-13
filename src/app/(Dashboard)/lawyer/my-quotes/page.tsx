@@ -9,9 +9,10 @@ import PageContainer from "@/app/(Dashboard)/components/container/PageContainer"
 import DashboardCard from "@/app/(Dashboard)/components/shared/DashboardCard";
 import TableRowData from "@/components/table/TableRowData";
 import TableState from "@/components/table/TableState";
+import StatusChip from "@/components/chip/StatusChip";
 import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCardTitleNode";
 import DialogSummary from "./components/DialogSummary";
-import StatusChip from "@/components/chip/StatusChip";
+import DialogEdit from "./components/DialogEdit";
 
 import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
 
@@ -27,6 +28,7 @@ const Dashboard = () => {
 
   const [selectedQuote, setSelectedQuote] = useState<QuoteModel>();
   const [openDialogSummary, setOpenSummary] = useState<boolean>(false);
+  const [openDialogEdit, setOpenEdit] = useState<boolean>(false);
   const [openMenu, setOpenMenu] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [openQuoteNote, setOpenQuoteNote] = useState<boolean>(false);
@@ -52,7 +54,7 @@ const Dashboard = () => {
     },
   });
 
-  const fetchCases = async () => {
+  const fetchQuotes = async () => {
     try {
       setLoading(true);
 
@@ -90,7 +92,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchCases();
+    fetchQuotes();
   }, [filter, page]);
 
    const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -195,6 +197,15 @@ const Dashboard = () => {
         caseId={selectedQuote?.caseId ?? ""}
       />
 
+      <DialogEdit 
+        open={openDialogEdit} 
+        onDialogClose={() => setOpenEdit(false)}
+        setOpenDialog={setOpenEdit} 
+        caseId={selectedQuote?.caseId ?? ""}
+        quote={selectedQuote}
+        fetchQuotes={fetchQuotes}
+      />
+
       <Dialog open={openQuoteNote} onClose={() => setOpenQuoteNote(false)}>
         <DialogTitle>
           Note
@@ -226,6 +237,15 @@ const Dashboard = () => {
             >
               Case Summary
             </Button>
+            {selectedQuote?.status == QuoteStatusEnum.PROPOSED && (
+              <Button
+                fullWidth 
+                variant="outlined" 
+                onClick={() => setOpenEdit(true)}
+              >
+                Edit Quote
+              </Button>
+            )}
             <Button
               fullWidth 
               variant="outlined" 
@@ -233,13 +253,15 @@ const Dashboard = () => {
             >
               Open Quote Note
             </Button>
-            <Button
-              fullWidth 
-              variant="outlined" 
-              // onClick={() => setQuoteNoteOpen(true)}
-            >
-              Open Reject Note
-            </Button>
+            {selectedQuote?.status == QuoteStatusEnum.REJECTED && (
+              <Button
+                fullWidth 
+                variant="outlined" 
+                // onClick={() => setQuoteNoteOpen(true)}
+              >
+                Open Reject Note
+              </Button>
+            )}
           </Stack>
         </DialogContent>
       </Dialog>

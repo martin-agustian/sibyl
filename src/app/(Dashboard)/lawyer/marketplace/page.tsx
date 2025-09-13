@@ -197,9 +197,10 @@ const Dashboard = () => {
 
       <DialogSummary 
         open={openDialogSummary} 
-        setOpenDialogSummary={setOpenDialogSummary}
+        setOpenDialog={setOpenDialogSummary}
         onDialogClose={() => setOpenDialogSummary(false)} 
         caseId={selectedCaseId}
+        fetchCases={fetchCases}
       />
     </PageContainer>
   );

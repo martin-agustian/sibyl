@@ -9,6 +9,7 @@ import Label from "@/components/form/Label";
 import InputText from "@/components/form/InputText";
 import HelperTextError from "@/components/form/HelperTextError";
 import InputTextArea from "@/components/form/InputTextArea";
+import ReadMoreText from "@/components/text/ReadMoreText";
 
 import { CaseModel } from "@/types/model/Case";
 
@@ -17,16 +18,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuotes";
 
 import { getCaseCategoryLabel } from "@/commons/helper";
-import ReadMoreText from "@/components/text/ReadMoreText";
 
 type DialogSummaryProps = {
 	caseId: string;
+	fetchCases: () => Promise<void>;
 	open: boolean;
-	setOpenDialogSummary: Dispatch<SetStateAction<boolean>>;
+	setOpenDialog: Dispatch<SetStateAction<boolean>>;
 	onDialogClose: () => void;
 };
 
-const DialogSummary = ({ caseId, open, setOpenDialogSummary, onDialogClose }: DialogSummaryProps) => {
+const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose }: DialogSummaryProps) => {
 	const [caseData, setCaseData] = useState<CaseModel>();
 
 	const [loading, setLoading] = useState<boolean>(true);
@@ -91,8 +92,14 @@ const DialogSummary = ({ caseId, open, setOpenDialogSummary, onDialogClose }: Di
 
 			if (response.ok) {
 				setCaseData(responseData);
-				setOpenDialogSummary(false);
-				fetchCase();
+				setOpenDialog(false);
+				fetchCases();
+
+				await Swal.fire({
+					title: "Success!",
+					icon: "success",
+					text: "Success submit a new quote",
+				});
 			} 
 			else throw new Error(responseData.error);
 
@@ -166,7 +173,7 @@ const DialogSummary = ({ caseId, open, setOpenDialogSummary, onDialogClose }: Di
 				<form onSubmit={onSubmitQuote(handleSubmitQuote)}>
 					<Grid container spacing={3}>
 						<Grid size={{ xs: 12, md: 6 }}>
-							<Label htmlFor="amount">Amount {getValueQuote("amount")}</Label>
+							<Label htmlFor="amount">Amount</Label>
 							<InputText id="amount" type="number" placeholder="Enter Amount" {...registerQuote("amount")} />
 
 							{caseQuote?.amount?.message && <HelperTextError>{caseQuote.amount.message}</HelperTextError>}
