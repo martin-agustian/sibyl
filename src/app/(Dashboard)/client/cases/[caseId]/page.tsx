@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
@@ -30,12 +31,16 @@ import {
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
 import { QuoteModel } from "@/types/model/Quote";
+import { UserRole } from "@/commons/type";
 
 import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
-import { CaseStatusEnum } from "@/commons/enum";
+import { CaseStatusEnum, UserRoleEnum } from "@/commons/enum";
 import { IconEdit } from "@tabler/icons-react";
 
 const CaseDetail = () => {
+  const { data: session } = useSession();
+  const userRole = session?.user.role as UserRole;
+
 	const { caseId } = useParams();
   const searchParams = useSearchParams();
   const paymentStatusParams = searchParams.get('payment-status');
@@ -255,7 +260,7 @@ const CaseDetail = () => {
           <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
             <DashboardCardTitle>Case Detail</DashboardCardTitle>
 
-            {caseData?.status === CaseStatusEnum.ENGAGED && (
+            {userRole !== UserRoleEnum.ADMIN && caseData?.status === CaseStatusEnum.ENGAGED && (
               <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
                 <IconButton size="small" color="primary" onClick={() => setMenuCaseOpen(true)}>
                   <IconEdit fontSize="small"></IconEdit>
@@ -430,7 +435,8 @@ const CaseDetail = () => {
         </DialogTitle>
         <DialogContent>
           <Stack gap={1}>
-            {caseData?.status === CaseStatusEnum.OPEN && (
+            {userRole !== UserRoleEnum.ADMIN && 
+              caseData?.status === CaseStatusEnum.OPEN && (
               <Button
                 fullWidth 
                 variant="outlined" 
@@ -450,7 +456,7 @@ const CaseDetail = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={quoteNoteOpen} onClose={() => setQuoteNoteOpen(false)}>
+      <Dialog fullWidth maxWidth="xs" open={quoteNoteOpen} onClose={() => setQuoteNoteOpen(false)}>
         <DialogTitle>
           Note
         </DialogTitle>

@@ -206,7 +206,11 @@ const Dashboard = () => {
         fetchQuotes={fetchQuotes}
       />
 
-      <Dialog open={openQuoteNote} onClose={() => setOpenQuoteNote(false)}>
+      <Dialog 
+        fullWidth maxWidth="xs" 
+        open={openQuoteNote} 
+        onClose={() => setOpenQuoteNote(false)}
+      >
         <DialogTitle>
           Note
         </DialogTitle>

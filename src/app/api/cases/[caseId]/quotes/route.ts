@@ -35,9 +35,6 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 			if (caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
-		} 
-    else if (role !== UserRoleEnum.LAWYER) {
-			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
 		// Build filter

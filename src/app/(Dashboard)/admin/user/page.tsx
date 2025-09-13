@@ -66,8 +66,8 @@ const User = () => {
   };
 
   return (
-    <PageContainer title="Users" description="This is user list">
-      <DashboardCard title="Users">
+    <PageContainer title="All Users" description="This is all user">
+      <DashboardCard title="All Users">
         <TableContainer component={Paper} elevation={9}>
           <Table>
             <TableHead>
@@ -103,7 +103,7 @@ const User = () => {
           </Table>
 
           <TablePagination
-            rowsPerPageOptions={[1, 2, 25]}
+            rowsPerPageOptions={[10, 20, 25]}
             component="div"
             count={usersTotal}
             rowsPerPage={rowsPerPage}

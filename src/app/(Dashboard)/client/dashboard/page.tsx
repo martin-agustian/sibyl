@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import Swal from "sweetalert2";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
@@ -18,8 +19,13 @@ import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 
 import { CaseModel } from "@/types/model/Case";
 import { getCaseCategoryLabel } from "@/commons/helper";
+import { UserRole } from "@/commons/type";
+import { UserRoleEnum } from "@/commons/enum";
 
 const Dashboard = () => {
+  const { data: session } = useSession();
+  const userRole = session?.user.role as UserRole;
+
 	const [cases, setCases] = useState<CaseModel[]>([]);
   const [casesTotal, setCasesTotal] = useState<number>(0);
 
@@ -28,7 +34,7 @@ const Dashboard = () => {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(2);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [filter, setFilter] = useState<FilterSchema>();
   
   const router = useRouter();
@@ -104,11 +110,14 @@ const Dashboard = () => {
   }
 
 	return (
-		<PageContainer title="My Cases" description="This is my cases">
+		<PageContainer 
+      title={userRole !== UserRoleEnum.ADMIN ? "My Cases" : "All Cases"} 
+      description={userRole !== UserRoleEnum.ADMIN ? "This is all cases" : "This is my cases"}
+    >
 			<DashboardCard 
         titleNode={
           <DashboardCardTitleNode 
-            title="My Case"
+            title={userRole !== UserRoleEnum.ADMIN ? "My Cases" : "All Cases"}
             openFilter={openFilter}
             setOpenFilter={setOpenFilter}
             handleCloseFilter={() => setOpenFilter(false)}
@@ -119,14 +128,16 @@ const Dashboard = () => {
           />
         }
         action={
-          <Button 
-            variant="contained" 
-            component={Link} 
-            href="/client/cases/new"
-            sx={{ fontWeight: "bold" }}
-          >
-            Add Case
-          </Button>
+          userRole !== UserRoleEnum.ADMIN && (
+            <Button 
+              variant="contained" 
+              component={Link} 
+              href="/client/cases/new"
+              sx={{ fontWeight: "bold" }}
+            >
+              Add Case
+            </Button>
+          )
         }
       >
 				<TableContainer component={Paper} elevation={9}>
@@ -150,7 +161,11 @@ const Dashboard = () => {
                   cases.map((c) => (
                     <TableRowData 
                       key={c.id} 
-                      onClick={() => { router.push(`/client/cases/${c.id}`) }}
+                      onClick={() => {
+                        userRole === UserRoleEnum.ADMIN ?
+                          router.push(`/admin/cases/${c.id}`) :
+                          router.push(`/client/cases/${c.id}`) 
+                      }}
                     >
                       <TableCell sx={{ textTransform: "capitalize" }}>
                         {c.title}
@@ -175,7 +190,7 @@ const Dashboard = () => {
 					</Table>
 
           <TablePagination
-            rowsPerPageOptions={[1, 2, 25]}
+            rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={casesTotal}
             rowsPerPage={rowsPerPage}

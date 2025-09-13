@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
 	const session = await getServerSession(authOptions);
-	if (!session || session.user.role !== UserRoleEnum.CLIENT) {
+	if (!session || (session.user.role !== UserRoleEnum.CLIENT && session.user.role !== UserRoleEnum.ADMIN)) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
@@ -92,7 +92,8 @@ export async function GET(req: Request) {
 			.filter(Boolean) || [];
 	const sortBy = searchParams.get("sort") || "";
 
-	const where: any = { clientId: session.user.id };
+	const where: any = {};
+	if (session.user.role == UserRoleEnum.CLIENT) where.clientId = session.user.id;
 	if (title) where.title = { contains: title, mode: "insensitive" };
 	if (status.length > 0) where.status = { in: status };
 	if (category) where.category = category;

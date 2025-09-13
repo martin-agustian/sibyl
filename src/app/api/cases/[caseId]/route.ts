@@ -36,8 +36,8 @@ export async function GET(req: Request, { params }: { params: { caseId: string }
 		}
 
 		// Access Control
-		if (role === UserRoleEnum.CLIENT) {
-			if (caseData.clientId !== userId) {
+		if (role === UserRoleEnum.CLIENT || role === UserRoleEnum.ADMIN) {
+			if (role === UserRoleEnum.CLIENT && caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 			}
 			return NextResponse.json(caseData);

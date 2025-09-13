@@ -30,5 +30,14 @@ export const getMenuItems = (role: UserRole) => {
     })
   }
 
+  if (role === UserRoleEnum.ADMIN) {
+    menu.push({
+      id: uniqueId(),
+      title: "Cases",
+      icon: IconChecklist,
+      href: "/admin/cases",
+    })
+  }
+
   return menu;
 };
