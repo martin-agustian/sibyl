@@ -255,7 +255,7 @@ const CaseDetail = () => {
           <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
             <DashboardCardTitle>Case Detail</DashboardCardTitle>
 
-            {caseData?.status !== CaseStatusEnum.CLOSED && (
+            {caseData?.status === CaseStatusEnum.ENGAGED && (
               <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
                 <IconButton size="small" color="primary" onClick={() => setMenuCaseOpen(true)}>
                   <IconEdit fontSize="small"></IconEdit>
