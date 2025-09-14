@@ -30,6 +30,7 @@ const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
 	const { getRootProps, getInputProps, isDragActive, acceptedFiles } = useDropzone({
 		onDrop,
 		maxFiles: 10, // max 10 files
+		maxSize: 1 * 1024 * 1024, // 1 MB
 		accept: {
 			"application/pdf": [],
 			"image/png": [],
@@ -67,7 +68,7 @@ const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
 						}}>
 						<input id={id} {...getInputProps()} />
 						<Typography variant="body1" color={theme.palette.text.disabled}>
-              {isDragActive ? "Drop the files here..." : "Drag & drop files here, or click to select (max 10 files)"}
+              {isDragActive ? "Drop the files here..." : "Drag & drop files here, or click to select (max 10 files, 2 MB each)"}
             </Typography>
 					</Paper>
 				)}
@@ -85,9 +86,9 @@ const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
             marginTop: 2,
           }}
         >
-					{files.map((file: any) => (
+					{files.map((file: any, i: any) => (
 						<Box 
-              key={file.name} 
+              key={i} 
               sx={{ 
                 position: "relative", 
                 width: "100%", 
