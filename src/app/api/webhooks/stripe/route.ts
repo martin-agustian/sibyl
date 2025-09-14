@@ -35,10 +35,7 @@ export async function POST(req: Request) {
           }),
           prisma.quote.updateMany({
             where: { caseId: payment.caseId, id: { not: payment.quoteId } },
-            data: { 
-              status: QuoteStatusEnum.REJECTED, 
-              statusNote: "Thank you for your quote. The client has decided to proceed with another provider" 
-            },
+            data: { status: QuoteStatusEnum.REJECTED },
           }),
           prisma.case.update({
             where: { id: payment.caseId },
