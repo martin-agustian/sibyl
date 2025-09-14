@@ -57,7 +57,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 			});
 
 			if (myQuoteData?.status === QuoteStatusEnum.ACCEPTED && caseData.status === CaseStatusEnum.ENGAGED) {
-				// Check Payment Status must "paid"
+				// check Payment Status must "paid"
 				const payment = await prisma.payment.findFirst({
 					where: {
 						caseId: caseData.id,
@@ -115,7 +115,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
 			return NextResponse.json({ error: "Case not found" }, { status: 404 });
 		}
 
-		// Only for data owner
+		// only for data owner
 		if (role !== "CLIENT" || caseData.clientId !== userId) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
@@ -128,12 +128,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
 			return NextResponse.json({ error: "Cannot update case after quotes have been submitted" }, { status: 400 });
 		}
 
-		// Check files limit
+		// check files limit
 		if (caseData.files.length + files.length > 10) {
 			return NextResponse.json({ error: "File limit exceeded (max 10 files per case)" }, { status: 400 });
 		}
 
-		// Upload files ke Cloudinary
+		// upload files to Cloudinary
 		const uploadedFiles: any[] = [];
 		for (const file of files) {
 			const arrayBuffer = await file.arrayBuffer();

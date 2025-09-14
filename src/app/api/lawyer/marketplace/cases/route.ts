@@ -38,7 +38,7 @@ export async function GET(req: Request) {
 			prisma.case.findMany({
 				where,
 				include: {
-					_count: { select: { quotes: true } }, // biar lawyer tahu sudah berapa quote
+					_count: { select: { quotes: true } },
 				},
 				orderBy,
 				skip: (page - 1) * pageSize,
