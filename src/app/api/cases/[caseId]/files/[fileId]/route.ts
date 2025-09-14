@@ -86,8 +86,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 	}
 }
 
-export async function DELETE(req: Request, { params }: { params: { caseId: string; fileId: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ caseId: string; fileId: string }> }) {
 	try {
+		const { caseId, fileId } = await params;
+
 		const session = await getServerSession(authOptions);
 		if (!session) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -95,7 +97,6 @@ export async function DELETE(req: Request, { params }: { params: { caseId: strin
 
 		const userId = session.user.id;
 		const role = session.user.role;
-		const { caseId, fileId } = params;
 
 		const caseData = await prisma.case.findUnique({
 			where: { id: caseId },

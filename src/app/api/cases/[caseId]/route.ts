@@ -87,8 +87,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 	}
 }
 
-export async function PATCH(req: Request, { params }: { params: { caseId: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
 	try {
+		const { caseId } = await params;
+
 		const session = await getServerSession(authOptions);
 		if (!session) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -96,7 +98,6 @@ export async function PATCH(req: Request, { params }: { params: { caseId: string
 
 		const userId = session.user.id;
 		const role = session.user.role;
-		const { caseId } = params;
 
 		const formData = await req.formData();
 		const title = formData.get("title") as string | null;
@@ -147,9 +148,7 @@ export async function PATCH(req: Request, { params }: { params: { caseId: string
 			});
 
 			uploadedFiles.push({
-				caseId,
-				cloudinaryId: uploadRes.public_id,
-				url: uploadRes.secure_url,
+				storagePath: uploadRes.public_id,
 				originalName: file.name,
 				mimeType: file.type,
 				size: file.size,
