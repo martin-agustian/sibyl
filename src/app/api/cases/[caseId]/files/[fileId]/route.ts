@@ -1,17 +1,9 @@
-import cloudinary from "cloudinary";
-
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import cloudinary from "@/lib/cloudinary";
+import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { CaseStatusEnum, PaymentStatusEnum, QuoteStatusEnum, UserRoleEnum } from "@/commons/enum";
-
-// Config Cloudinary
-cloudinary.v2.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 export async function GET(req: Request, { params }: { params: Promise<{ caseId: string; fileId: string }> }) {
 	try {
