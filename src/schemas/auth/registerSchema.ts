@@ -4,7 +4,7 @@ import { UserRoleEnum } from "@/commons/enum";
 export const registerSchema = z.object({
   name: z.string().min(1, "Name cannot be empty"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  email: z.email("Email not valid"),
+  email: z.email("Email is not valid"),
   role: z.enum([UserRoleEnum.CLIENT, UserRoleEnum.LAWYER]),
   jurisdiction: z.string().optional(),
   barNumber: z.string().optional(),

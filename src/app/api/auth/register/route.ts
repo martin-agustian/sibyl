@@ -1,13 +1,8 @@
-import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import z from "zod";
 import prisma from "@/lib/prisma";
-
-const schema = z.object({
-  name: z.string().min(1),
-  email: z.email(),
-  password: z.string().min(6),
-});
+import z from "zod";
+import { NextResponse } from "next/server";
+import { registerSchema } from "@/schemas/auth/registerSchema";
 
 export async function POST(req: Request) {
   try {
@@ -15,11 +10,11 @@ export async function POST(req: Request) {
   
     const { email, password, name, role, jurisdiction, barNumber } = body;
   
-    const result = schema.safeParse(body);  
-    if (!result.success) {
+    const validate = registerSchema.safeParse(body);
+    if (!validate.success) {
       return NextResponse.json({
         message: "validation failed", 
-        response: z.flattenError(result.error) 
+        response: z.flattenError(validate.error) 
       }, { status: 400 });
     }
   
