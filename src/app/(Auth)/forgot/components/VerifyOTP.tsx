@@ -51,7 +51,7 @@ const VerifyOTP = ({ title, subtitle, subtext, register, errors, loadingSubmit, 
             </Typography>
           )}
         </Box>
-        <Box>
+        <Box sx={{ marginTop: "25px" }}>
           <Typography
             htmlFor="password"
             component="label"

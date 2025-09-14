@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const forgotSchema = z.object({
-  email: z.email({ error: "Email is not valid" }),
+  email: z.email("Email is not valid"),
 });
 
 export type ForgotSchema = z.infer<typeof forgotSchema>;

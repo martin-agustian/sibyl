@@ -1,7 +1,10 @@
+import bcrypt from "bcrypt";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mailer";
 import { forgotSchema } from "@/schemas/auth/forgotSchema";
+
 import { z } from "zod";
 import { forgotVerifySchema } from "@/schemas/auth/forgotVerifySchema";
 
@@ -41,7 +44,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json();
-    const { email, code } = body;
+    const { email, code, password } = body;
 
     const validate = forgotVerifySchema.safeParse(body);
     if (!validate.success) {
@@ -65,6 +68,15 @@ export async function PUT(req: Request) {
     await prisma.otp.update({
       where: { id: otp.id },
       data: { isUsed: true },
+    });
+
+    // hash password baru
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // update user password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash: hashedPassword },
     });
 
     return NextResponse.json({ success: true });

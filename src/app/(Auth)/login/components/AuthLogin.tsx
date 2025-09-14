@@ -73,7 +73,7 @@ const AuthLogin = ({ title, subtitle, subtext, register, errors, loadingSubmit, 
             </Typography>
 
             <Typography 
-              href="/" 
+              href="/forgot" 
               component={Link}
               sx={{
                 color: "primary.main",
