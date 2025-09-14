@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useDownloadFile } from "@/hooks/useDownloadFile";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import DashboardCard from "@/app/(Dashboard)/components/card/DashboardCard";
@@ -29,7 +30,6 @@ import {
 } from "@mui/material";
 
 import { CaseModel } from "@/types/model/Case";
-import { FileModel } from "@/types/model/File";
 import { QuoteModel } from "@/types/model/Quote";
 import { UserRole } from "@/commons/type";
 
@@ -46,6 +46,8 @@ const CaseDetail = () => {
 	const { caseId } = useParams();
   const searchParams = useSearchParams();
   const paymentStatusParams = searchParams.get('payment-status');
+
+  const { loadingDownload, handleDownloadFile } = useDownloadFile(caseId as string);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingQuote, setLoadingQuote] = useState<boolean>(true);
@@ -162,33 +164,6 @@ const CaseDetail = () => {
     const url = new URL(window.location.href);
     url.searchParams.delete('payment-status');
     window.history.replaceState({}, '', url.pathname + url.search);
-  }
-
-  const handleDownloadFile = async (file: FileModel) => {
-    try {
-      if (!file.id) return;
-			const response = await fetch(`/api/cases/${caseId}/files/${file.id}`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.originalName || "downloaded-file";
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-      else {
-        const data = await response.json();
-        throw new Error(data.error);
-      }
-		} 
-    catch (error) {
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
-		}
   }
 
   const handleAcceptQuote = async () => {
@@ -339,7 +314,10 @@ const CaseDetail = () => {
               <Typography variant="body1">loading...</Typography>
             ) : (
               caseData?.files && caseData.files.length > 0 ? (
-                <FilePreview files={caseData.files} onBoxClick={handleDownloadFile} onActionClick={handleDownloadFile} />
+                <FilePreview 
+                  files={caseData.files} 
+                  loadingText={loadingDownload ? "Downloading.." : ""}
+                  onBoxClick={handleDownloadFile} onActionClick={handleDownloadFile} />
               ) : (
                 <Typography variant="body1">-</Typography>
               )

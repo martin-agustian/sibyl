@@ -29,6 +29,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 						createdAt: true,
 					},
 				},
+				_count: {
+					select: { quotes: true },
+				},
 			},
 		});
 

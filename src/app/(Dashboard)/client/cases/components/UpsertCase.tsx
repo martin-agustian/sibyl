@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDownloadFile } from "@/hooks/useDownloadFile";
 import { useDeleteFile } from "@/hooks/useDeleteFile";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addCasesSchema, AddCasesSchema } from "@/schemas/cases/addCasesSchema";
 
@@ -21,10 +22,13 @@ import InputFile from "@/components/form/InputFile";
 import FilePreview from "@/components/preview/FilePreview";
 
 import { lawCategoryOptions } from "@/commons/options";
+import { CaseStatusEnum } from "@/commons/enum";
 import { CaseModel } from "@/types/model/Case";
 import { FileModel } from "@/types/model/File";
 
 const UpsertCases = ({ caseId } : { caseId?: string }) => {
+  const router = useRouter();
+
   const title = caseId ? "Edit Case" : "New Case";
   const description = caseId ? "This is edit case" : "This is new case";
 
@@ -64,6 +68,15 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
 
       if (response.ok) {
         const caseData = data as CaseModel;
+
+        // middleware
+        if (
+          caseData.status !== CaseStatusEnum.OPEN && 
+          caseData._count.quotes > 0
+        ) {
+          router.push("/client/cases");
+        }
+
         setValueCase("title", caseData.title);
         setValueCase("category", caseData.category);
         setValueCase("description", caseData.description);
@@ -87,6 +100,63 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
   useEffect(() => {
     if (caseId) fetchCase();
   }, [caseId]);
+
+  const handleSubmit = (data: AddCasesSchema) => {
+    if (caseId) handleEditCase(data);
+    else handleSubmitCase(data);
+  };
+
+  const handleEditCase = async (data: AddCasesSchema) => {
+    try {
+      setLoadingSubmit(true);
+
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("category", data.category);
+      formData.append("description", data.description);
+
+      const totalFiles = files.length + (data.files ? data.files.length : 0);
+      if (totalFiles > 10) throw new Error("Max files per case is 10");
+
+      if (data.files && data.files.length > 0) {
+        data.files.forEach((file) => {
+          formData.append("files", file);
+        });
+      }
+
+      const res = await fetch(`/api/cases/${caseId}`, {
+        method: "PATCH",
+        body: formData,
+      });
+
+      if (res.ok) {        
+        await Swal.fire({
+          timer: 3000,
+          title: "Success!",
+          text: "Success created case",
+          icon: "success",
+        });
+        
+        router.push(`/client/cases/${caseId}`);
+      }
+      else {
+        const result = await res.json();
+        throw new Error(result.error);
+      }
+
+      setLoadingSubmit(false);
+    } catch (error) {
+      setLoadingSubmit(false);
+
+      await Swal.fire({
+        timer: 3000,
+        title: "Error!",
+        text: error instanceof Error ? error.message : error as string,
+        icon: "error",
+        showConfirmButton: false,
+      });
+    }
+  };
 
   const handleSubmitCase = async (data: AddCasesSchema) => {
     try {
@@ -146,7 +216,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
             Loading...
           </Typography>
         ) : (
-          <form onSubmit={onSubmitCase(handleSubmitCase)}>
+          <form onSubmit={onSubmitCase(handleSubmit)}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Label htmlFor="title">Title</Label>

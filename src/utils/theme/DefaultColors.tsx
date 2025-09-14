@@ -1,6 +1,8 @@
 import { createTheme } from "@mui/material/styles";
 import { Plus_Jakarta_Sans } from "next/font/google";
 
+import { red } from "@mui/material/colors";
+
 export const plus = Plus_Jakarta_Sans({
   weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
@@ -34,7 +36,7 @@ const baselightTheme = createTheme({
       contrastText: "#ffffff",
     },
     error: {
-      main: "#FA896B",
+      main: red[700],
       light: "#FDEDE8",
       dark: "#f3704d",
       contrastText: "#ffffff",
