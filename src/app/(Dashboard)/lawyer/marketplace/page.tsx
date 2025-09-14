@@ -43,7 +43,7 @@ const Dashboard = () => {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
 
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(2);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
   const [filter, setFilter] = useState<FilterSchema>();
 
   const {
@@ -178,7 +178,7 @@ const Dashboard = () => {
           </Table>
 
           <TablePagination
-            rowsPerPageOptions={[1, 2, 25]}
+            rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={casesTotal}
             rowsPerPage={rowsPerPage}

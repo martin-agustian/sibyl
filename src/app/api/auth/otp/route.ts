@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
     const validate = forgotSchema.safeParse(body);
     if (!validate.success) {
-      return NextResponse.json({ message: "validation failed", response: z.flattenError(validate.error) }, { status: 400 });
+      return NextResponse.json({ error: z.flattenError(validate.error) }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     await sendMail(user.email, "Your OTP Code", `<p>${code}</p>`);
 
-    return NextResponse.json({ success: true, message: "OTP sent" });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Send OTP error:", error);
     return NextResponse.json({ error: error }, { status: 500 });
@@ -48,7 +48,7 @@ export async function PUT(req: Request) {
 
     const validate = forgotVerifySchema.safeParse(body);
     if (!validate.success) {
-      return NextResponse.json({ message: "validation failed", response: z.flattenError(validate.error) }, { status: 400 });
+      return NextResponse.json({ error: z.flattenError(validate.error) }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({ where: { email } });

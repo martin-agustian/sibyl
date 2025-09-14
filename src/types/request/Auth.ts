@@ -15,6 +15,6 @@ export type ForgotBody = {
 
 export type ForgotVerifyBody = {
 	email: string;
-	otp: string;
+	code: string;
 	password: string;
 };

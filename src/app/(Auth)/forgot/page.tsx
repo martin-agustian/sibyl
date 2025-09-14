@@ -94,12 +94,12 @@ const Forgot = () => {
 
       const body: ForgotVerifyBody = {
         email: getValuesForgot("email"),
-        otp: data.code,
+        code: data.code,
         password: data.password
       };
   
       const response = await fetch(`/api/auth/otp`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -116,7 +116,7 @@ const Forgot = () => {
         
         router.push("/login");
       } else {
-        throw responseData?.error;
+        throw responseData?.error ?? "";
       }
   
       setLoadingSubmit(false);

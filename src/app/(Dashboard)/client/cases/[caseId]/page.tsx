@@ -59,7 +59,7 @@ const CaseDetail = () => {
   const [quoteTotal, setQuoteTotal] = useState<number>(0);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   
   const [selectedQuote, setSelectedQuote] = useState<QuoteModel>();
 
@@ -374,7 +374,7 @@ const CaseDetail = () => {
             </Table>
 
             <TablePagination
-              rowsPerPageOptions={[1, 2, 25]}
+              rowsPerPageOptions={[5, 10, 25]}
               component="div"
               count={quoteTotal}
               rowsPerPage={rowsPerPage}

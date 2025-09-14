@@ -38,7 +38,7 @@ const Dashboard = () => {
   const [openQuoteNote, setOpenQuoteNote] = useState<boolean>(false);
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filter, setFilter] = useState<FilterSchema>();
 
   const {
@@ -179,7 +179,7 @@ const Dashboard = () => {
           </Table>
 
           <TablePagination
-            rowsPerPageOptions={[1, 2, 25]}
+            rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={quoteTotal}
             rowsPerPage={rowsPerPage}

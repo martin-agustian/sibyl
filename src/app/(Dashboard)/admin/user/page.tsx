@@ -19,7 +19,7 @@ const User = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const [page, setPage] = useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
   const fetchUsers = async () => {
     try {
@@ -99,7 +99,7 @@ const User = () => {
           </Table>
 
           <TablePagination
-            rowsPerPageOptions={[10, 20, 25]}
+            rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={usersTotal}
             rowsPerPage={rowsPerPage}
