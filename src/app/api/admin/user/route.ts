@@ -26,6 +26,8 @@ export async function GET(req: Request) {
 					name: true,
 					email: true,
 					role: true,
+					barNumber: true,
+					jurisdiction: true,
 					createdAt: true,
 				},
 				orderBy: { createdAt: "desc" },
