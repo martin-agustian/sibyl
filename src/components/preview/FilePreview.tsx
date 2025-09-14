@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { Box } from "@mui/system";
 import { IconButton, Typography } from "@mui/material";
 
@@ -17,6 +19,8 @@ const FilePreview = ({
   loadingText, loadingAction, files, actionType = "DOWNLOAD", 
   onActionClick, onBoxClick 
 }: FilePreviewProps) => {
+  const [selectedFile, setSelectedFile] = useState<FileModel>();
+
 	return (
 		<Box
 			sx={{
@@ -31,7 +35,10 @@ const FilePreview = ({
         {files.map((file: FileModel) => (
           <Box
             key={file.originalName}
-            onClick={() => onBoxClick(file)}
+            onClick={() => {
+              onBoxClick(file);
+              setSelectedFile(file);
+            }}
             sx={{
               position: "relative",
               width: "100%",
@@ -62,7 +69,7 @@ const FilePreview = ({
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {loadingText ? loadingText : file.originalName}
+                    {loadingText && selectedFile?.id == file.id ? loadingText : file.originalName}
                   </Typography>
               </Box>
 
