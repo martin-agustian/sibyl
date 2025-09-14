@@ -7,7 +7,7 @@ import { useDownloadFile } from "@/hooks/useDownloadFile";
 import { useDeleteFile } from "@/hooks/useDeleteFile";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addCasesSchema, AddCasesSchema } from "@/schemas/cases/addCasesSchema";
+import { upsertCasesSchema, UpsertCasesSchema } from "@/schemas/cases/upsertCasesSchema";
 
 import { Box, Button, Grid, Typography } from "@mui/material";
 
@@ -49,8 +49,8 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
     handleSubmit: onSubmitCase,
     formState: { errors: caseErrors },
     reset: resetCase,
-  } = useForm<AddCasesSchema>({
-    resolver: zodResolver(addCasesSchema),
+  } = useForm<UpsertCasesSchema>({
+    resolver: zodResolver(upsertCasesSchema),
     mode: "onChange",
     defaultValues: {
       title: "",
@@ -101,12 +101,12 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
     if (caseId) fetchCase();
   }, [caseId]);
 
-  const handleSubmit = (data: AddCasesSchema) => {
+  const handleSubmit = (data: UpsertCasesSchema) => {
     if (caseId) handleEditCase(data);
     else handleSubmitCase(data);
   };
 
-  const handleEditCase = async (data: AddCasesSchema) => {
+  const handleEditCase = async (data: UpsertCasesSchema) => {
     try {
       setLoadingSubmit(true);
 
@@ -133,7 +133,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
         await Swal.fire({
           timer: 3000,
           title: "Success!",
-          text: "Success created case",
+          text: "Success update case",
           icon: "success",
         });
         
@@ -158,7 +158,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
     }
   };
 
-  const handleSubmitCase = async (data: AddCasesSchema) => {
+  const handleSubmitCase = async (data: UpsertCasesSchema) => {
     try {
       setLoadingSubmit(true);
 

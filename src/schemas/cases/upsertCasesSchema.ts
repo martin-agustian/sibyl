@@ -6,7 +6,7 @@ const CATEGORIES = LAW_CATEGORIES.map((category) => category.value);
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB in bytes
 const ACCEPTED_FILE_TYPES = ["application/pdf", "image/png", "image/jpeg", "image/jpg"];
 
-export const addCasesSchema = z.object({
+export const upsertCasesSchema = z.object({
 	title: z.string().min(1, "Title is required"),
 	description: z.string().min(1, "Description is required"),
 	category: z.enum(CATEGORIES, "Category is required"),
@@ -21,5 +21,5 @@ export const addCasesSchema = z.object({
 		.optional(),
 });
 
-export type AddCasesSchema = z.infer<typeof addCasesSchema>;
-export type AddCasesSchemaErrors = Partial<Record<keyof AddCasesSchema, string[]>>;
+export type UpsertCasesSchema = z.infer<typeof upsertCasesSchema>;
+export type UpsertCasesSchemaErrors = Partial<Record<keyof UpsertCasesSchema, string[]>>;
