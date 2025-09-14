@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Box, Button, Dialog, DialogContent, Divider, Grid, Typography } from "@mui/material";
 
 import Label from "@/components/form/Label";
-import InputText from "@/components/form/InputText";
+import InputNumber from "@/components/form/InputNumber";
 import HelperTextError from "@/components/form/HelperTextError";
 import InputTextArea from "@/components/form/InputTextArea";
 import ReadMoreText from "@/components/text/ReadMoreText";
@@ -17,9 +17,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuoteSchema";
 
-import { getCaseCategoryLabel } from "@/commons/helper";
 import { UpsertQuoteBody } from "@/types/request/Quote";
-import InputNumber from "@/components/form/InputNumber";
+import { getCaseCategoryLabel } from "@/commons/helper";
+import { showError } from "@/commons/error";
 
 type DialogSummaryProps = {
 	caseId: string;
@@ -63,11 +63,7 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 			setLoading(false);
 		} catch (error) {
 			setLoading(false);
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+			showError(error);
 		}
 	};
 
@@ -110,11 +106,7 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 			setLoadingSubmit(false);
 		} catch (error) {
 			setLoadingSubmit(false);
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+			showError(error);
 		}
   };
 

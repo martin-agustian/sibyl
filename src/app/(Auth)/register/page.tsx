@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, RegisterSchema } from "@/schemas/auth/registerSchema";
 
 import { Grid, Box, Card } from "@mui/material";
 
@@ -15,9 +16,9 @@ import Logo from "@/components/Logo";
 import AuthRegister from "./components/AuthRegister";
 import Subtitle from "../components/Subtitle";
 
-import { UserRoleEnum } from "@/commons/enum";
-import { registerSchema, RegisterSchema } from "@/schemas/auth/registerSchema";
 import { RegisterBody } from "@/types/request/Auth";
+import { UserRoleEnum } from "@/commons/enum";
+import { showError } from "@/commons/error";
 
 const Register = () => {
   const router = useRouter();
@@ -86,14 +87,7 @@ const Register = () => {
 			setLoadingSubmit(false);
 		} catch (error) {
 			setLoadingSubmit(false);
-
-			await Swal.fire({
-				timer: 3000,
-				title: "Error!",
-				text: error instanceof Error ? error.message : (error as string),
-				icon: "error",
-				showConfirmButton: false,
-			});
+			showError(error);
 		}
 	};
 

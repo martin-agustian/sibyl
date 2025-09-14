@@ -20,6 +20,8 @@ import { forgotSchema, ForgotSchema } from "@/schemas/auth/forgotSchema";
 import { forgotVerifySchema, ForgotVerifySchema } from "@/schemas/auth/forgotVerifySchema";
 import { ForgotBody, ForgotVerifyBody } from "@/types/request/Auth";
 
+import { showError } from "@/commons/error";
+
 const Forgot = () => {
   const router = useRouter();
 
@@ -82,14 +84,7 @@ const Forgot = () => {
     }
     catch (error) {
       setLoadingSubmit(false);
-
-      await Swal.fire({
-        timer: 3000,
-        title: "Error!",
-        text: error instanceof Error ? error.message : (error as string),
-        icon: "error",
-        showConfirmButton: false,
-      });
+      showError(error);
     }
   }
 
@@ -128,14 +123,7 @@ const Forgot = () => {
     } 
     catch (error) {
       setLoadingSubmit(false);
-
-      await Swal.fire({
-        timer: 3000,
-        title: "Error!",
-        text: error instanceof Error ? error.message : (error as string),
-        icon: "error",
-        showConfirmButton: false,
-      });
+      showError(error);
     }
   };
 

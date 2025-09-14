@@ -1,7 +1,6 @@
-import Swal from "sweetalert2";
-
 import { useState } from "react";
 import { FileModel } from "@/types/model/File";
+import { showError } from "@/commons/error";
 
 export const useDownloadFile = (caseId?: string) => {
   const [loadingDownload, setLoadingDownload] = useState(false);
@@ -28,11 +27,7 @@ export const useDownloadFile = (caseId?: string) => {
       setLoadingDownload(false);
     } catch (error) {
       setLoadingDownload(false);
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : String(error),
-      });
+      showError(error);
     }
   };
 

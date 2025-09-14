@@ -1,6 +1,5 @@
 "use client";
 import dayjs from "dayjs";
-import Swal from "sweetalert2";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 
@@ -11,6 +10,7 @@ import TableState from "@/components/table/TableState";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow } from "@mui/material";
 
 import { UserModel } from "@/types/model/User";
+import { showError } from "@/commons/error";
 
 const User = () => {
   const [users, setUsers] = useState<UserModel[]>([]);
@@ -42,13 +42,9 @@ const User = () => {
       }
 
       setLoading(false);
-    }
-    catch (error) {
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
+    } catch (error) {
+      setLoading(false);
+      showError(error);
     }
   };
 

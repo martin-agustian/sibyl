@@ -34,6 +34,7 @@ import { QuoteModel } from "@/types/model/Quote";
 import { UserRole } from "@/commons/type";
 
 import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
+import { showError } from "@/commons/error";
 import { CaseStatusEnum, UserRoleEnum } from "@/commons/enum";
 import { IconEdit } from "@tabler/icons-react";
 
@@ -51,6 +52,7 @@ const CaseDetail = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingQuote, setLoadingQuote] = useState<boolean>(true);
+  const [loadingMenu, setLoadingMenu] = useState<boolean>(false);
 
 	const [caseData, setCaseData] = useState<CaseModel>();
   const [quoteData, setQuoteData] = useState<QuoteModel[]>([]);
@@ -78,15 +80,10 @@ const CaseDetail = () => {
       else throw new Error(data.error);
 
       setLoading(false);
-		} 
+		}
     catch (error) {
       setLoading(false);
-
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+			showError(error);
 		}
 	};
 
@@ -112,12 +109,7 @@ const CaseDetail = () => {
 		} 
     catch (error) {
       setLoadingQuote(false);
-
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+      showError(error);
 		}
   };
 
@@ -169,7 +161,10 @@ const CaseDetail = () => {
   const handleAcceptQuote = async () => {
     try {
       if (!selectedQuote?.id) return;
-			const response = await fetch(`/api/cases/${caseId}/quotes/${selectedQuote.id}/accept`, {
+
+      setLoadingMenu(true);
+			
+      const response = await fetch(`/api/cases/${caseId}/quotes/${selectedQuote.id}/accept`, {
         method: "POST",
       });
       const data = await response.json();
@@ -178,13 +173,10 @@ const CaseDetail = () => {
         window.location.href = data.checkoutUrl;
       }
       else throw new Error(data.error);
-		} 
-    catch (error) {
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+      setLoadingMenu(false);
+		} catch (error) {
+      setLoadingMenu(false);
+      showError(error);			
 		}
   }
 
@@ -205,13 +197,14 @@ const CaseDetail = () => {
           const data = await response.json();
 
           if (!response.ok) {
-            throw new Error(data.error || "Failed to close case.");
+            throw new Error(data.error || "Failed to close case");
           }
 
           return data;
         } catch (error) {
           Swal.showValidationMessage(
-            error instanceof Error ? error.message : (error as string)
+            error instanceof Error ? error.message : 
+              typeof error === "string" ? error : "Failed to close case"
           );
           return false;
         }
@@ -436,14 +429,16 @@ const CaseDetail = () => {
                 fullWidth 
                 variant="outlined" 
                 onClick={handleAcceptQuote}
+                disabled={loadingMenu}
               >
-                Accept Quote
+                {loadingMenu ? "Loading..." : "Accept Quote"}
               </Button>
             )}
             <Button
               fullWidth 
               variant="outlined" 
               onClick={() => setQuoteNoteOpen(true)}
+              disabled={loadingMenu}
             >
               Open Note
             </Button>

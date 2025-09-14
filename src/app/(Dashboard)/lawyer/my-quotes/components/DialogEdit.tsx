@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { upsertQuoteSchema, UpsertQuoteSchema } from "@/schemas/quote/upsertQuoteSchema";
 import { UpsertQuoteBody } from "@/types/request/Quote";
+import { showError } from "@/commons/error";
 
 type DialogEditProps = {
   caseId: string;
@@ -84,11 +85,7 @@ const DialogEdit = ({ caseId, quote, fetchQuotes, open, setOpenDialog, onDialogC
       setLoadingSubmit(false);			
     } catch (error) {
       setLoadingSubmit(false);
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
+      showError(error);
     }
   };
 

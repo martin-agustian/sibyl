@@ -19,6 +19,7 @@ import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, 
 
 import { CaseModel } from "@/types/model/Case";
 import { getCaseCategoryLabel } from "@/commons/helper";
+import { showError } from "@/commons/error";
 import { UserRole } from "@/commons/type";
 import { UserRoleEnum } from "@/commons/enum";
 
@@ -82,11 +83,8 @@ const Dashboard = () => {
       setLoading(false);
     }
     catch (error) {
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
+      setLoading(false);
+      showError(error);
     }
   };
 

@@ -1,6 +1,5 @@
 "use client";
 import dayjs from "dayjs";
-import Swal from "sweetalert2";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,11 +13,16 @@ import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCard
 import DialogSummary from "./components/DialogSummary";
 import DialogEdit from "./components/DialogEdit";
 
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
+import { 
+  Button, Dialog, DialogActions, DialogContent, 
+  DialogTitle, Paper, Stack, Table, TableBody, TableCell, TableContainer, 
+  TableHead, TablePagination, TableRow 
+} from "@mui/material";
 
 import { QuoteModel } from "@/types/model/Quote";
 import { formatNumber, getCaseCategoryLabel } from "@/commons/helper";
-import { CaseStatusEnum, QuoteStatusEnum } from "@/commons/enum";
+import { QuoteStatusEnum } from "@/commons/enum";
+import { showError } from "@/commons/error";
 
 const Dashboard = () => {
   const [quotes, setQuotes] = useState<QuoteModel[]>([]);
@@ -82,12 +86,7 @@ const Dashboard = () => {
     } 
     catch (error) {
       setLoading(false);
-
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
+      showError(error);
     }
   };
 

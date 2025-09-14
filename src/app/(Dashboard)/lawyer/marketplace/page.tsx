@@ -17,6 +17,7 @@ import DashboardCardTitleNode, { FilterSchema } from "./components/DashboardCard
 import DialogSummary from "./components/DialogSummary";
 
 import { getCaseCategoryLabel } from "@/commons/helper";
+import { showError } from "@/commons/error";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -96,12 +97,7 @@ const Dashboard = () => {
     }
     catch (error) {
       setLoading(false);
-
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
+      showError(error);
     }
   };
 

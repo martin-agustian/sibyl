@@ -18,6 +18,8 @@ import Logo from "@/components/Logo";
 import AuthLogin from "./components/AuthLogin";
 import Subtitle from "../components/Subtitle";
 
+import { showError } from "@/commons/error";
+
 const Login = () => {
 	const searchParams = useSearchParams();
 	const errorMessage = searchParams.get("error") || "";
@@ -72,14 +74,7 @@ const Login = () => {
 		} 
 		catch (error) {
 			setLoadingSubmit(false);
-
-			await Swal.fire({
-				timer: 3000,
-				title: "Error!",
-				text: error instanceof Error ? error.message : (error as string),
-				icon: "error",
-				showConfirmButton: false,
-			});
+			showError(error);
 		}
 	};
 

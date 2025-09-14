@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 
 import { useState } from "react";
 import { FileModel } from "@/types/model/File";
+import { showError } from "@/commons/error";
 
 export const useDeleteFile = (caseId?: string) => {
   const [loadingDeleteFile, setLoadingDeleteFile] = useState(false);
@@ -30,11 +31,7 @@ export const useDeleteFile = (caseId?: string) => {
       setLoadingDeleteFile(false);
     } catch (error) {
       setLoadingDeleteFile(false);
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : String(error),
-      });
+      showError(error);
     }
   };
 

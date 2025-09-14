@@ -21,6 +21,7 @@ import InputTextArea from "@/components/form/InputTextArea";
 import InputFile from "@/components/form/InputFile";
 import FilePreview from "@/components/preview/FilePreview";
 
+import { showError } from "@/commons/error";
 import { lawCategoryOptions } from "@/commons/options";
 import { CaseStatusEnum } from "@/commons/enum";
 import { CaseModel } from "@/types/model/Case";
@@ -88,12 +89,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
     } 
     catch (error) {
       setLoading(false);
-
-      await Swal.fire({
-        title: "Error!",
-        icon: "error",
-        text: error instanceof Error ? error.message : (error as string),
-      });
+      showError(error);
     }
   };
 
@@ -147,14 +143,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
       setLoadingSubmit(false);
     } catch (error) {
       setLoadingSubmit(false);
-
-      await Swal.fire({
-        timer: 3000,
-        title: "Error!",
-        text: error instanceof Error ? error.message : error as string,
-        icon: "error",
-        showConfirmButton: false,
-      });
+      showError(error);
     }
   };
 
@@ -197,14 +186,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
       setLoadingSubmit(false);
     } catch (error) {
       setLoadingSubmit(false);
-
-      await Swal.fire({
-        timer: 3000,
-        title: "Error!",
-        text: error instanceof Error ? error.message : "Unknown error",
-        icon: "error",
-        showConfirmButton: false,
-      });
+      showError(error);
     }
   };
 

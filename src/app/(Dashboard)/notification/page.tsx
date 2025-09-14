@@ -1,5 +1,4 @@
 "use client";
-import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
 import { useEffect, useState } from "react";
@@ -11,6 +10,8 @@ import { Box, Grid, Stack } from "@mui/system";
 import { Chip, Pagination, Typography } from "@mui/material";
 
 import { NotificationModel } from "@/types/model/Notification";
+
+import { showError } from "@/commons/error";
 
 const Notification = () => {
 	const [loading, setLoading] = useState<boolean>(true);
@@ -43,11 +44,8 @@ const Notification = () => {
 			setLoading(false);
 		} 
 		catch (error) {
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+			setLoading(false);
+			showError(error);
 		}
 	};
 

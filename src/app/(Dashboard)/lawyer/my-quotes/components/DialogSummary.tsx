@@ -10,6 +10,7 @@ import FilePreview from "@/components/preview/FilePreview";
 
 import { CaseModel } from "@/types/model/Case";
 import { getCaseCategoryLabel } from "@/commons/helper";
+import { showError } from "@/commons/error";
 
 type DialogSummaryProps = {
 	caseId: string;
@@ -40,12 +41,7 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 		}
 		catch (error) {
 			setLoading(false);
-
-			await Swal.fire({
-				title: "Error!",
-				icon: "error",
-				text: error instanceof Error ? error.message : (error as string),
-			});
+			showError(error);
 		}
 	};
 
