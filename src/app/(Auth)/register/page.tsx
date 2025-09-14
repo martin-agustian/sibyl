@@ -7,12 +7,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Grid, Box, Card, Stack, Typography } from "@mui/material";
+import { Grid, Box, Card } from "@mui/material";
 
 import Link from "next/link";
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import Logo from "@/components/Logo";
 import AuthRegister from "./components/AuthRegister";
+import Subtitle from "../components/Subtitle";
 
 import { UserRoleEnum } from "@/commons/enum";
 import { registerSchema, RegisterSchema } from "@/schemas/auth/registerSchema";
@@ -133,31 +134,7 @@ const Register = () => {
 								</Link>
 							</Box>
 							<AuthRegister
-								subtitle={
-									<Stack
-										sx={{
-											flexDirection: "row",
-											alignItems: "center",
-											justifyContent: "center",
-											gap: 0.5,
-											marginTop: 3,
-										}}>
-										<Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 500 }}>
-											Has an account ?
-										</Typography>
-										<Typography
-											href="/login"
-											component={Link}
-											variant="subtitle1"
-											sx={{
-												fontWeight: 500,
-												textDecoration: "none",
-												color: "primary.main",
-											}}>
-											Sign In
-										</Typography>
-									</Stack>
-								}
+								subtitle={<Subtitle text="Has an account?" linkText="Sign In" link="/login" />}
 								register={register}
                 controlRegister={controlRegister}
 								errors={registerErrors}

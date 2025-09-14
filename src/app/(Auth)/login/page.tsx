@@ -9,13 +9,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginSchema } from "@/schemas/auth/loginSchema";
 import { signIn } from "next-auth/react";
 
-import { Grid, Box, Card, Stack, Typography, Divider, Button } from "@mui/material";
+import { Grid, Box, Card, Typography, Divider, Button } from "@mui/material";
 import { IconBrandGoogleFilled } from "@tabler/icons-react";
 
 import Link from "next/link";
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import Logo from "@/components/Logo";
 import AuthLogin from "./components/AuthLogin";
+import Subtitle from "../components/Subtitle";
 
 const Login = () => {
 	const searchParams = useSearchParams();
@@ -119,31 +120,7 @@ const Login = () => {
 								</Link>
 							</Box>
 							<AuthLogin								
-								subtitle={
-									<Stack
-										sx={{
-											flexDirection: "row",
-											alignItems: "center",
-											justifyContent: "center",
-											gap: 0.5,
-											marginTop: 3,
-										}}>
-										<Typography variant="subtitle1" color="textSecondary" sx={{ fontWeight: 500 }}>
-											New to Sibyl ?
-										</Typography>
-										<Typography
-											href="/register"
-											component={Link}
-											variant="subtitle1"
-											sx={{
-												fontWeight: 500,
-												textDecoration: "none",
-												color: "primary.main",
-											}}>
-											Create an account
-										</Typography>
-									</Stack>
-								}
+								subtitle={<Subtitle text="New to Sibyl?" linkText="Sign Up" link="/register" />}
 								register={registerLogin}
 								errors={loginErrors}
 								loadingSubmit={loadingSubmit}
@@ -173,8 +150,8 @@ const Login = () => {
 							</Button>
 
 							<Typography sx={{ fontSize: "12px", color: "grey", mt: 1.5 }}>
-								In the future when login with gmail and email is not found,
-								new account automatically created.
+								In the future, when logging in with Gmail and the email is not found, 
+								a new account should be created automatically.
 							</Typography>
 						</Card>
 					</Grid>

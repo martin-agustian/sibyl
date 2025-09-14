@@ -8,3 +8,12 @@ export type RegisterBody = {
 	jurisdiction?: string;
 	barNumber?: string;
 };
+
+export type ForgotBody = {
+	email: string;
+};
+
+export type ForgotVerifyBody = {
+	otp: string;
+	password: string;
+};
