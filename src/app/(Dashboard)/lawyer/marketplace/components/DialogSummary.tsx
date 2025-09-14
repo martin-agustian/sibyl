@@ -40,12 +40,18 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 		getValues: getValueQuote,
 		setValue: setValueQuote,
 		control: controlQuote,
+		reset: resetQuote,
 		register: registerQuote,
 		handleSubmit: onSubmitQuote,
 		formState: { errors: caseQuote },
 	} = useForm<UpsertQuoteSchema>({
 		resolver: zodResolver(upsertQuoteSchema),
 		mode: "onChange",
+		defaultValues: {
+			amount: 0,
+			expectedDays: 0,
+			note: "",
+		},
 	});
 
 	const fetchCase = async () => {
@@ -93,6 +99,7 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 			if (response.ok) {
 				setCaseData(responseData);
 				setOpenDialog(false);
+				resetQuote();
 				fetchCases();
 
 				await Swal.fire({
