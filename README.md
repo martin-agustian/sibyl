@@ -8,6 +8,7 @@
 
 * **Next.js 13+ (App Router)**
 * **Prisma + PostgreSQL (Supabase)**
+* **MUI** (styled components base)
 * **NextAuth.js** (JWT strategy, role-based access)
 * **Stripe** (checkout & webhook payments)
 * **Cloudinary** (document storage)
@@ -22,30 +23,73 @@
 /api
   /auth/[...nextauth]                                     → Authentication (login/logout)
   /auth
-    POST   /register                                      → Create new user x
-    POST   /otp                                           → Send OTP via Email (Forgot Password) x
-    PUT    /otp                                           → Verify OTP via and update Password x
+    POST   /register                                      → Create new user
+    POST   /otp                                           → Send OTP via Email (Forgot Password)
+    PUT    /otp                                           → Verify OTP via and update Password
   /cases
-    POST   /cases                                         → Client creates case x
-    GET    /cases                                         → Client lists own cases x
+    POST   /cases                                         → Client creates case
+    GET    /cases                                         → Client lists own cases
     GET    /cases/[:caseId]                               → Case detail (show files only to ACCEPTED lawyer) x
-    PATCH  /cases/[:caseId]                               → Update case (OPEN & no quotes yet) x
-    PATCH  /cases/[:caseId]/close                         → Close case (client only, ENGAGED → CLOSED) x
-    DELETE /cases/[:caseId]/files/[:fileId]               → Delete file (OPEN & no quotes yet) x
-    GET    /cases/[:caseId]/files/[:fileId]               → Download file (access controlled) x
-    GET    /cases/[:caseId]/quotes                        → List quotes for a case (pagination/filter) x
-    POST   /cases/[:caseId]/quotes/[:quoteId]/accept      → Client accepts quote → Stripe checkout x    
+    PATCH  /cases/[:caseId]                               → Update case (OPEN & no quotes yet)
+    PATCH  /cases/[:caseId]/close                         → Close case (client only, ENGAGED → CLOSED)
+    DELETE /cases/[:caseId]/files/[:fileId]               → Delete file (OPEN & no quotes yet)
+    GET    /cases/[:caseId]/files/[:fileId]               → Download file (access controlled)
+    GET    /cases/[:caseId]/quotes                        → List quotes for a case (pagination/filter)
+    POST   /cases/[:caseId]/quotes/[:quoteId]/accept      → Client accepts quote → Stripe checkout  
   /lawyer
     GET    /marketplace/cases                             → Lawyer browse open cases
     POST   /marketplace/cases/[:caseId]/quotes            → Submit quote
     PATCH  /marketplace/cases/[:caseId]/quotes/[:quoteId] → Update quote
     GET    /quotes                                        → Lawyer lists own quotes
   /admin
-    GET    /users                 → Admin list users (pagination/filter)
+    GET    /users                                         → Admin list users (pagination/filter)
   /notifications
-    GET    /notifications                                  → List user notifications (pagination/filter)
+    GET    /notifications                                 → List user notifications (pagination/filter)
   /webhooks
-    POST   /stripe                                         → Stripe webhook (paid/failed/expired)
+    POST   /stripe                                        → Stripe webhook (paid/failed/expired)
+```
+
+---
+
+## 📂 FOLDER Structure
+
+```
+/prisma
+│
+├── schema.prisma       → Defines database models and connection setup
+├── seed.ts             → Script for generating dummy data into the database
+└── migrate/            → Contains Prisma migration history and files
+
+/public
+└── images/             → Publicly accessible images (e.g., logos, assets)
+
+/src
+│
+├── app/
+│   ├── (Dashboard)/    → UI pages for dashboards (admin, lawyer, client)
+│   ├── (Landing)/      → UI pages for the landing/home page
+│   ├── (Auth)/         → UI pages for authentication (login, register, forgot password)
+│   └── api/            → API route handlers (path reflects the folder structure)
+│
+├── commons/
+│   ├── helper/         → Reusable utility functions (e.g., formatters, parsers)
+│   ├── type/           → Commonly used type definitions (e.g., status enums, user roles)
+│   └── constants.ts    → Static values like roles, case statuses, etc.
+│
+├── components/         → Global and reusable UI components (e.g., form inputs, logo, table rows)
+│
+├── hooks/              → Custom React hooks (e.g., useDownloadFile, useDebounce)
+│                        → Similar to `/commons/helper`, but focused on stateful or side-effect logic
+│
+├── lib/                → Configured libraries and integrations (e.g., auth, prisma, stripe)
+│
+├── schema/             → Form validation schemas (e.g., Zod schemas for inputs, file size limits)
+│
+├── types/              → Global type definitions (e.g., `User`, `Quote`, API request bodies)
+│
+├── utils/              → Utility files for theming, styling, or non-component utilities
+│
+└── middleware.ts       → Middleware logic (e.g., route protection, auth guards)
 ```
 
 ---
