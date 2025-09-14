@@ -25,7 +25,7 @@ export const useDeleteFile = (caseId?: string) => {
         window.location.reload();
       } else {
         const data = await response.json();
-        throw new Error(data.error);
+        throw data.error;
       }
 
       setLoadingDeleteFile(false);

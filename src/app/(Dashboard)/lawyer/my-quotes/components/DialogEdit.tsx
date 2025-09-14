@@ -80,7 +80,7 @@ const DialogEdit = ({ caseId, quote, fetchQuotes, open, setOpenDialog, onDialogC
           text: "Success submit edit quote",
         });
       } 
-      else throw new Error(responseData.error);
+      else throw responseData.error;
 
       setLoadingSubmit(false);			
     } catch (error) {

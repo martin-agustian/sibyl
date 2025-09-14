@@ -10,6 +10,10 @@ export const formatNumber = (value: number | string): string => {
   return num.toLocaleString("en-SG");
 };
 
+export const setCapitalize = (word: string) => {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 export const getCaseCategoryLabel = (value: string) => {
 	return LAW_CATEGORIES.find((v) => v.value == value)?.label ?? "";
 };

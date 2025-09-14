@@ -21,7 +21,7 @@ export const useDownloadFile = (caseId?: string) => {
         URL.revokeObjectURL(url);
       } else {
         const data = await response.json();
-        throw new Error(data.error);
+        throw data.error;
       }
 
       setLoadingDownload(false);

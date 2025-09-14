@@ -77,7 +77,7 @@ const Forgot = () => {
         
         setIsVerifyOTP(true);
       } else {
-        throw new Error(responseData?.error ?? "");
+        throw responseData?.error;
       }
   
       setLoadingSubmit(false);
@@ -116,7 +116,7 @@ const Forgot = () => {
         
         router.push("/login");
       } else {
-        throw new Error(responseData?.error ?? "");
+        throw responseData?.error;
       }
   
       setLoadingSubmit(false);

@@ -77,7 +77,7 @@ const CaseDetail = () => {
       if (response.ok) {
         setCaseData(data);
       }
-      else throw new Error(data.error);
+      else data.error;
 
       setLoading(false);
 		}
@@ -103,7 +103,7 @@ const CaseDetail = () => {
         setQuoteData(data.quotes);
         setQuoteTotal(data.total);
       }
-      else throw new Error(data.error);
+      else data.error;
 
       setLoadingQuote(false);
 		} 
@@ -172,7 +172,7 @@ const CaseDetail = () => {
       if (response.ok) {
         window.location.href = data.checkoutUrl;
       }
-      else throw new Error(data.error);
+      else data.error;
       setLoadingMenu(false);
 		} catch (error) {
       setLoadingMenu(false);
@@ -197,7 +197,7 @@ const CaseDetail = () => {
           const data = await response.json();
 
           if (!response.ok) {
-            throw new Error(data.error || "Failed to close case");
+            throw data.error || "Failed to close case";
           }
 
           return data;

@@ -79,7 +79,7 @@ const Dashboard = () => {
         setQuoteTotal(data.total);
       }
       else {
-        throw new Error(data.error);
+        throw data.error;
       }
 
       setLoading(false);

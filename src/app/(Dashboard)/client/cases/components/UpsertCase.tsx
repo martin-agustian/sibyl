@@ -83,7 +83,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
         setValueCase("description", caseData.description);
         setFiles(caseData.files);
       }
-      else throw new Error(data.error);
+      else throw data.error;
 
       setLoading(false);
     } 
@@ -112,7 +112,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
       formData.append("description", data.description);
 
       const totalFiles = files.length + (data.files ? data.files.length : 0);
-      if (totalFiles > 10) throw new Error("Max files per case is 10");
+      if (totalFiles > 10) throw "Max files per case is 10";
 
       if (data.files && data.files.length > 0) {
         data.files.forEach((file) => {
@@ -137,7 +137,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
       }
       else {
         const result = await res.json();
-        throw new Error(result.error);
+        throw result.error;
       }
 
       setLoadingSubmit(false);
@@ -180,7 +180,7 @@ const UpsertCases = ({ caseId } : { caseId?: string }) => {
         });
       }
       else {
-        throw new Error("Failed to create case");
+        throw "Failed to create case";
       }
 
       setLoadingSubmit(false);

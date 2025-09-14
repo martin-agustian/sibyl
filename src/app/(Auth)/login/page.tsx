@@ -67,7 +67,7 @@ const Login = () => {
 								
 				window.location.href = callbackUrl;
 			} else {
-				throw new Error(response?.error ?? "");
+				throw response?.error;
 			}
 	
 			setLoadingSubmit(false);

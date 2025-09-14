@@ -81,7 +81,7 @@ const Register = () => {
 	
 				router.push("/login");
 			} else {
-				throw new Error(responseData?.error ?? "");
+				throw responseData.error;
 			}
 	
 			setLoadingSubmit(false);

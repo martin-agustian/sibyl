@@ -39,7 +39,7 @@ const Notification = () => {
 				setTotal(data.total);
 				setTotalPage(data.totalPages);
 			}
-			else throw new Error(data.error);
+			else throw data.error;
 
 			setLoading(false);
 		} 

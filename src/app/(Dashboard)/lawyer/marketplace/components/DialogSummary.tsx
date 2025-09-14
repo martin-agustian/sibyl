@@ -58,7 +58,7 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 
 			if (response.ok) {
 				setCaseData(data);
-			} else throw new Error(data.error);
+			} else throw data.error;
 
 			setLoading(false);
 		} catch (error) {
@@ -101,7 +101,7 @@ const DialogSummary = ({ caseId, fetchCases, open, setOpenDialog, onDialogClose 
 					text: "Success submit a new quote",
 				});
 			} 
-			else throw new Error(responseData.error);
+			else throw responseData.error;
 
 			setLoadingSubmit(false);
 		} catch (error) {

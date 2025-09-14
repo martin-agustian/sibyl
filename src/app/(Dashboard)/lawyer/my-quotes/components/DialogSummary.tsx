@@ -35,7 +35,7 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
 
 			if (response.ok) {
 				setCaseData(data);
-			} else throw new Error(data.error);
+			} else throw data.error;
 
 			setLoading(false);
 		}

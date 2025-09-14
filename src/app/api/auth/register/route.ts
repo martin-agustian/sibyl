@@ -12,18 +12,12 @@ export async function POST(req: Request) {
   
     const validate = registerSchema.safeParse(body);
     if (!validate.success) {
-      return NextResponse.json({
-        message: "validation failed", 
-        response: z.flattenError(validate.error) 
-      }, { status: 400 });
+      return NextResponse.json({ error: z.flattenError(validate.error) }, { status: 400 });
     }
   
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return NextResponse.json({ 
-        message: "Email already in use",
-        response: null 
-      }, { status: 400 });
+      return NextResponse.json({ error: "Email already in use" }, { status: 400 });
     }
   
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,15 +33,9 @@ export async function POST(req: Request) {
     	},
     });
   
-    return NextResponse.json({ 
-      message: "User created", 
-      response: user, 
-    }, { status: 200 });
-
-  } catch (error) {
-    return NextResponse.json({
-      message: "Error",
-      response: error,
-    })
+    return NextResponse.json(user, { status: 200 });
+  } 
+  catch (error) {
+    return NextResponse.json({ error: error });
   }
 }
