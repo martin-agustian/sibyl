@@ -43,7 +43,6 @@ export async function GET(req: Request) {
 			totalPages: Math.ceil(total / pageSize),
 		});
 	} catch (err) {
-		console.error("User list error:", err);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: err }, { status: 500 });
 	}
 }

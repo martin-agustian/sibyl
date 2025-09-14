@@ -78,6 +78,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
 		});
 	} catch (error) {
 		console.error("Accept quote error:", error);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: error }, { status: 500 });
 	}
 }

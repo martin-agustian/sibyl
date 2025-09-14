@@ -80,6 +80,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
 		return NextResponse.json(closedCase);
 	} catch (err) {
 		console.error("Close case error:", err);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: err }, { status: 500 });
 	}
 }

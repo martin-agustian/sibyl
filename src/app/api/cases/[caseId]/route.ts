@@ -84,7 +84,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	} catch (error) {
 		console.error("Case detail error:", error);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: error }, { status: 500 });
 	}
 }
 
@@ -171,6 +171,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
 		return NextResponse.json(updatedCase);
 	} catch (err) {
 		console.error("Update case error:", err);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: err }, { status: 500 });
 	}
 }

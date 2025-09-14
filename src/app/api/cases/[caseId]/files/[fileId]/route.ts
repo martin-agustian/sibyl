@@ -138,6 +138,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ caseI
 		return NextResponse.json({ success: true });
 	} catch (err) {
 		console.error("Delete file error:", err);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: err }, { status: 500 });
 	}
 }

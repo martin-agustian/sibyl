@@ -41,6 +41,6 @@ export async function GET(req: Request) {
 		});
 	} catch (err) {
 		console.error("Notification list error:", err);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: err }, { status: 500 });
 	}
 }

@@ -54,6 +54,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
 		return NextResponse.json({ success: true, quote: updatedQuote });
 	} catch (error) {
 		console.error("Update quote error:", error);
-		return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+		return NextResponse.json({ error: error }, { status: 500 });
 	}
 }
