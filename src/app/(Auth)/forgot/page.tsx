@@ -1,8 +1,8 @@
 "use client";
 import Swal from "sweetalert2";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,20 +12,26 @@ import { Grid, Box, Card } from "@mui/material";
 import Link from "next/link";
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
 import Logo from "@/components/Logo";
-import EmailOTP from "./components/EmailOTP";
 import Subtitle from "../components/Subtitle";
+import EmailOTP from "./components/EmailOTP";
+import VerifyOTP from "./components/VerifyOTP";
 
 import { forgotSchema, ForgotSchema } from "@/schemas/auth/forgotSchema";
 import { forgotVerifySchema, ForgotVerifySchema } from "@/schemas/auth/forgotVerifySchema";
-import { ForgotBody } from "@/types/request/Auth";
+import { ForgotBody, ForgotVerifyBody } from "@/types/request/Auth";
 
 const Forgot = () => {
-  const searchParams = useSearchParams();
-  const errorMessage = searchParams.get("error") || "";
+  const router = useRouter();
 
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
+  const [isVerifyOTP, setIsVerifyOTP] = useState<boolean>(false);
+
+  const subtitle = (
+    <Subtitle text="Remember the password ?" linkText="Sign In" link="/login" />
+  );
 
   const {
+    getValues: getValuesForgot,
     register: registerForgot,
     handleSubmit: onSubmitForgot,
     formState: { errors: forgotErrors },
@@ -42,16 +48,6 @@ const Forgot = () => {
     resolver: zodResolver(forgotVerifySchema),
     mode: "onChange",
   });
-
-  useEffect(() => {
-    if (errorMessage) {
-      Swal.fire({
-        title: "Error!",
-        html: errorMessage,
-        icon: "error",
-      });
-    }
-  }, [errorMessage])
 
   const handleSubmitForgot = async (data: ForgotSchema) => {
     try {
@@ -72,13 +68,12 @@ const Forgot = () => {
 
       if (response?.ok) {
         await Swal.fire({
-          timer: 3000,
           title: "Success!",
           text: "Success send otp, check your email",
           icon: "success",
-          showConfirmButton: false,
         });
-  
+        
+        setIsVerifyOTP(true);
       } else {
         throw new Error(responseData?.error ?? "");
       }
@@ -98,44 +93,51 @@ const Forgot = () => {
     }
   }
 
-  // const handleSubmit = async (data: ForgotVerifySchema) => {
-  //   try {
-  //     setLoadingSubmit(true);
-  
-  //     const response = await signIn("credentials", {
-  //       email: data.email,
-  //       password: data.password,
-  //       redirect: false,
-  //     });
-  
-  //     if (response?.ok) {
-  //       await Swal.fire({
-  //         timer: 3000,
-  //         title: "Success!",
-  //         text: "Success login",
-  //         icon: "success",
-  //         showConfirmButton: false,
-  //       });
-                
-  //       window.location.href = callbackUrl;
-  //     } else {
-  //       throw new Error(response?.error ?? "");
-  //     }
-  
-  //     setLoadingSubmit(false);
-  //   } 
-  //   catch (error) {
-  //     setLoadingSubmit(false);
+  const handleSubmit = async (data: ForgotVerifySchema) => {
+    try {
+      setLoadingSubmit(true);
 
-  //     await Swal.fire({
-  //       timer: 3000,
-  //       title: "Error!",
-  //       text: error instanceof Error ? error.message : (error as string),
-  //       icon: "error",
-  //       showConfirmButton: false,
-  //     });
-  //   }
-  // };
+      const body: ForgotVerifyBody = {
+        email: getValuesForgot("email"),
+        otp: data.code,
+        password: data.password
+      };
+  
+      const response = await fetch(`/api/auth/otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const responseData = await response.json();
+  
+      if (response?.ok) {
+        await Swal.fire({
+          title: "Success!",
+          text: "Success update password",
+          icon: "success",
+        });
+        
+        router.push("/login");
+      } else {
+        throw new Error(responseData?.error ?? "");
+      }
+  
+      setLoadingSubmit(false);
+    } 
+    catch (error) {
+      setLoadingSubmit(false);
+
+      await Swal.fire({
+        timer: 3000,
+        title: "Error!",
+        text: error instanceof Error ? error.message : (error as string),
+        icon: "error",
+        showConfirmButton: false,
+      });
+    }
+  };
 
   return (
     <PageContainer title="Login" description="this is Login page">
@@ -173,15 +175,26 @@ const Forgot = () => {
                   <Logo />
                 </Link>
               </Box>
-
-              <EmailOTP
-                subtitle={<Subtitle text="Remember the password ?" linkText="Sign In" link="/login" />}
-                register={registerForgot}
-								errors={forgotErrors}
-								loadingSubmit={loadingSubmit}
-								handleSubmit={handleSubmitForgot}
-								onSubmit={onSubmitForgot}
-              />
+              
+              {isVerifyOTP ? (
+                <VerifyOTP
+                  subtitle={subtitle}
+                  register={registerForgotVerify}
+                  errors={forgotVerifyErrors}
+                  loadingSubmit={loadingSubmit}
+                  handleSubmit={handleSubmit}
+                  onSubmit={onSubmitForgotVerify}
+                />
+              ) : (
+                <EmailOTP
+                  subtitle={subtitle}
+                  register={registerForgot}
+                  errors={forgotErrors}
+                  loadingSubmit={loadingSubmit}
+                  handleSubmit={handleSubmitForgot}
+                  onSubmit={onSubmitForgot}
+                />
+              )}
             </Card>
           </Grid>
         </Grid>

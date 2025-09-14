@@ -8,12 +8,13 @@ import { Delete } from "@mui/icons-material";
 import { Control, Controller, UseFormSetValue, UseFormWatch } from "react-hook-form";
 
 type InputFileProps = {
+	id?: string;
   watch: UseFormWatch<any>;
 	setValue: UseFormSetValue<any>;
 	control: Control<any>;
 };
 
-const InputFile = ({ control, watch, setValue }: InputFileProps) => {
+const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
   const theme = useTheme();
 
 	const files = watch("files");
@@ -46,7 +47,7 @@ const InputFile = ({ control, watch, setValue }: InputFileProps) => {
 
 	return (
 		<>
-			<Controller
+			<Controller				
 				control={control}
 				name="files"
 				render={() => (
@@ -64,7 +65,7 @@ const InputFile = ({ control, watch, setValue }: InputFileProps) => {
 							paddingX: { xs: 5, md: 10 },
               paddingY: 10,
 						}}>
-						<input {...getInputProps()} />
+						<input id={id} {...getInputProps()} />
 						<Typography variant="body1" color={theme.palette.text.disabled}>
               {isDragActive ? "Drop the files here..." : "Drag & drop files here, or click to select (max 10 files)"}
             </Typography>
