@@ -39,7 +39,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 			return NextResponse.json({ error: "Case not found" }, { status: 404 });
 		}
 
-		// Access Control
+		// Access Control Client & Admin
 		if (role === UserRoleEnum.CLIENT || role === UserRoleEnum.ADMIN) {
 			if (role === UserRoleEnum.CLIENT && caseData.clientId !== userId) {
 				return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -47,6 +47,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 			return NextResponse.json(caseData);
 		}
 
+		// Access Control Lawyer
 		if (role === UserRoleEnum.LAWYER) {
 			const myQuoteData = await prisma.quote.findFirst({
 				where: {

@@ -1,34 +1,114 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# ⚖️ Sibyl – Legal Marketplace
 
-## Getting Started
+**Sibyl** is a legal marketplace platform connecting **Clients** and **Lawyers**. Clients can create legal cases, upload documents, receive quotes from lawyers, accept a quote, and pay securely via **Stripe**.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+## 🚀 Tech Stack
+
+* **Next.js 13+ (App Router)**
+* **Prisma + PostgreSQL (Supabase)**
+* **NextAuth.js** (JWT strategy, role-based access)
+* **Stripe** (checkout & webhook payments)
+* **Cloudinary** (document storage)
+* **Nodemailer** (email notifications)
+* **TypeScript**
+
+---
+
+## 📂 API Structure
+
+```
+/api
+  /auth/[...nextauth]                                     → Authentication (login/logout)
+  /auth
+    POST   /register                                      → Create new user x
+    POST   /otp                                           → Send OTP via Email (Forgot Password) x
+    PUT    /otp                                           → Verify OTP via and update Password x
+  /cases
+    POST   /cases                                         → Client creates case x
+    GET    /cases                                         → Client lists own cases x
+    GET    /cases/[:caseId]                               → Case detail (show files only to ACCEPTED lawyer) x
+    PATCH  /cases/[:caseId]                               → Update case (OPEN & no quotes yet) x
+    PATCH  /cases/[:caseId]/close                         → Close case (client only, ENGAGED → CLOSED) x
+    DELETE /cases/[:caseId]/files/[:fileId]               → Delete file (OPEN & no quotes yet) x
+    GET    /cases/[:caseId]/files/[:fileId]               → Download file (access controlled) x
+    GET    /cases/[:caseId]/quotes                        → List quotes for a case (pagination/filter) x
+    POST   /cases/[:caseId]/quotes/[:quoteId]/accept      → Client accepts quote → Stripe checkout x    
+  /lawyer
+    GET    /marketplace/cases                             → Lawyer browse open cases
+    POST   /marketplace/cases/[:caseId]/quotes            → Submit quote
+    PATCH  /marketplace/cases/[:caseId]/quotes/[:quoteId] → Update quote
+    GET    /quotes                                        → Lawyer lists own quotes
+  /admin
+    GET    /users                 → Admin list users (pagination/filter)
+  /notifications
+    GET    /notifications                                  → List user notifications (pagination/filter)
+  /webhooks
+    POST   /stripe                                         → Stripe webhook (paid/failed/expired)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🔑 Roles & Access Control
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+* **Client**
 
-## Learn More
+  * Create and manage cases (can only update if case is `OPEN` and has no quotes yet).
+  * View all quotes for their cases.
+  * Accept quotes & pay via Stripe.
+  * Close case once it is finished.
 
-To learn more about Next.js, take a look at the following resources:
+* **Lawyer**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  * Browse open cases.
+  * Submit/update quotes.
+  * Access case files **only if their quote is accepted and payment is successful**.
+  * View list of their own quotes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+* **Admin**
 
-## Deploy on Vercel
+  * List users.
+  * View all case with quotes (only views).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* **Notifications**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  * All major events (new quote, quote accepted, payment success/failed) → generate **in-app notification** (DB) + **email notification**.
+
+---
+
+## 📦 Database Models (Prisma)
+
+* **User** → Clients, Lawyers, Admins (role-based).
+* **Case** → Created by client, has many files & quotes.
+* **File** → Case documents (stored in Cloudinary).
+* **Quote** → Lawyer proposal for a case.
+* **Payment** → Stripe transaction (status: pending / paid / failed).
+* **Notification** → In-app notification for user.
+
+---
+
+## ⚡ Development Setup
+
+1. Clone repo & install dependencies
+
+   ```bash
+   npm install
+   ```
+2. Setup environment variables in `.env`
+
+   ```env
+   DATABASE_URL="postgresql://..."
+   NEXTAUTH_SECRET=""
+   .... See .env.example (i leave comments there)
+   ```
+3. Run Prisma migration
+
+   ```bash
+   npx prisma migrate dev
+   ```
+4. Start dev server
+
+   ```bash
+   npm run dev
+   ```
