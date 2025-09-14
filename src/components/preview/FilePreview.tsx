@@ -2,14 +2,21 @@ import { Box } from "@mui/system";
 import { IconButton, Typography } from "@mui/material";
 
 import { FileModel } from "@/types/model/File";
-import { Download } from "@mui/icons-material";
+import { Delete, Download } from "@mui/icons-material";
 
 type FilePreviewProps = {
+  loadingText?: string;
+  loadingAction?: boolean;
 	files: FileModel[];
+  actionType?: "DOWNLOAD" | "DELETE";
   onActionClick: (file: FileModel) => void;
+  onBoxClick: (file: FileModel) => void;
 };
 
-const FilePreview = ({ files, onActionClick }: FilePreviewProps) => {
+const FilePreview = ({ 
+  loadingText, loadingAction, files, actionType = "DOWNLOAD", 
+  onActionClick, onBoxClick 
+}: FilePreviewProps) => {
 	return (
 		<Box
 			sx={{
@@ -24,6 +31,7 @@ const FilePreview = ({ files, onActionClick }: FilePreviewProps) => {
         {files.map((file: FileModel) => (
           <Box
             key={file.originalName}
+            onClick={() => onBoxClick(file)}
             sx={{
               position: "relative",
               width: "100%",
@@ -31,6 +39,10 @@ const FilePreview = ({ files, onActionClick }: FilePreviewProps) => {
               border: "1px solid #CCCCCC",
               borderRadius: 2,
               overflow: "hidden",
+              "&:hover": { 
+                borderColor: "primary.main",
+                cursor: "pointer" 
+              }
             }}>
               <Box
                 sx={{
@@ -50,23 +62,41 @@ const FilePreview = ({ files, onActionClick }: FilePreviewProps) => {
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {file.originalName}
+                    {loadingText ? loadingText : file.originalName}
                   </Typography>
               </Box>
 
-              <IconButton
-								size="small"
-								onClick={() => onActionClick(file)}
-								sx={{
-                  position: "absolute",
-									top: 3, 
-                  right: 3,
-									bgcolor: "rgba(255,255,255,0.8)",
-									"&:hover": { bgcolor: "primary.main", color: "white" },
-								}}
-              >
-                <Download fontSize="small" />
-							</IconButton>
+              {actionType === "DELETE" ? (
+                <IconButton
+                  size="small"
+                  onClick={(e) => { e.stopPropagation(); onActionClick(file);}}
+                  loading={loadingAction}
+                  sx={{
+                    position: "absolute",
+                    top: 3,
+                    right: 3,
+                    bgcolor: "rgba(255,255,255,0.8)",
+                    "&:hover": { bgcolor: "error.main", color: "white" },
+                  }}
+                >
+                  <Delete fontSize="small" />
+                </IconButton>
+              ) : (
+                <IconButton
+                  size="small"
+                  onClick={(e) => { e.stopPropagation(); onActionClick(file);}}
+                  loading={loadingAction}
+                  sx={{
+                    position: "absolute",
+                    top: 3, 
+                    right: 3,
+                    bgcolor: "rgba(255,255,255,0.8)",
+                    "&:hover": { bgcolor: "primary.main", color: "white" },
+                  }}
+                >
+                  <Download fontSize="small" />
+                </IconButton>
+              )}
           </Box>
         ))}
 		</Box>

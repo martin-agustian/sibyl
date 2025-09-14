@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import dayjs from "dayjs";
 
 import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import PageContainer from "@/app/(Dashboard)/components/container/PageContainer";
@@ -38,6 +38,8 @@ import { CaseStatusEnum, UserRoleEnum } from "@/commons/enum";
 import { IconEdit } from "@tabler/icons-react";
 
 const CaseDetail = () => {
+  const router = useRouter();
+
   const { data: session } = useSession();
   const userRole = session?.user.role as UserRole;
 
@@ -260,7 +262,10 @@ const CaseDetail = () => {
           <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
             <DashboardCardTitle>Case Detail</DashboardCardTitle>
 
-            {userRole !== UserRoleEnum.ADMIN && caseData?.status === CaseStatusEnum.ENGAGED && (
+            {!loading && !loadingQuote && userRole !== UserRoleEnum.ADMIN && (
+              caseData?.status === CaseStatusEnum.ENGAGED || 
+              (caseData?.status === CaseStatusEnum.OPEN && quoteData.length == 0)
+            ) && (
               <Stack direction="row" sx={{ gap: 0.5, alignItems: "center" }}>
                 <IconButton size="small" color="primary" onClick={() => setMenuCaseOpen(true)}>
                   <IconEdit fontSize="small"></IconEdit>
@@ -334,7 +339,7 @@ const CaseDetail = () => {
               <Typography variant="body1">loading...</Typography>
             ) : (
               caseData?.files && caseData.files.length > 0 ? (
-                <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />
+                <FilePreview files={caseData.files} onBoxClick={handleDownloadFile} onActionClick={handleDownloadFile} />
               ) : (
                 <Typography variant="body1">-</Typography>
               )
@@ -412,7 +417,7 @@ const CaseDetail = () => {
 
       <Dialog fullWidth maxWidth="xs" open={menuCaseOpen} onClose={() => setMenuCaseOpen(false)}>
         <DialogTitle>
-          Case Menu
+          Menu
         </DialogTitle>
         <DialogContent>
           <Stack gap={1}>
@@ -423,6 +428,18 @@ const CaseDetail = () => {
                 onClick={handleCloseCase}
               >
                 Close Case
+              </Button>
+            )}
+            {caseData?.status === CaseStatusEnum.OPEN && quoteData.length == 0 && (
+              <Button
+                fullWidth 
+                variant="outlined" 
+                onClick={() => {
+                  router.push(`/client/cases/${caseId}/edit`);
+                  setMenuCaseOpen(false);
+                }}
+              >
+                Edit Case
               </Button>
             )}
           </Stack>

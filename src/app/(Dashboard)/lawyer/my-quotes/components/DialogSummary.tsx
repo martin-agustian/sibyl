@@ -136,7 +136,7 @@ const DialogSummary = ({ caseId, open, onDialogClose }: DialogSummaryProps) => {
               <Typography variant="body1">loading...</Typography>
             ) : (
               caseData?.files && caseData.files.length > 0 ? (
-                <FilePreview files={caseData.files} onActionClick={handleDownloadFile} />
+                <FilePreview files={caseData.files} onBoxClick={handleDownloadFile} onActionClick={handleDownloadFile} />
               ) : (
                 <Typography variant="body1">-</Typography>
               )

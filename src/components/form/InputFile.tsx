@@ -1,6 +1,8 @@
 "use client";
+import Swal from "sweetalert2";
+
 import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { FileRejection, useDropzone } from "react-dropzone";
 
 import { Box, Typography, Paper, IconButton, useTheme } from "@mui/material";
 
@@ -9,26 +11,52 @@ import { Control, Controller, UseFormSetValue, UseFormWatch } from "react-hook-f
 
 type InputFileProps = {
 	id?: string;
-  watch: UseFormWatch<any>;
+	watch: UseFormWatch<any>;
 	setValue: UseFormSetValue<any>;
 	control: Control<any>;
 };
 
 const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
-  const theme = useTheme();
+	const theme = useTheme();
 
 	const files = watch("files");
 
-	const onDrop = useCallback(
-		(acceptedFiles: any) => {
-			const newFiles = [...(files || []), ...acceptedFiles].slice(0, 10);
-			setValue("files", newFiles, { shouldValidate: true });
-		},
-		[files, setValue]
-	);
+	const onDrop = useCallback((acceptedFiles: any) => {
+		const newFiles = [...(files || []), ...acceptedFiles].slice(0, 10);
+		setValue("files", newFiles, { shouldValidate: true });
+	}, [files, setValue]);
 
-	const { getRootProps, getInputProps, isDragActive, acceptedFiles } = useDropzone({
+	const onDropRejected = useCallback((fileRejections: FileRejection[]) => {
+		fileRejections.forEach(({ file, errors }) => {
+			errors.forEach((err) => {
+				if (err.code === "file-too-large") {
+					Swal.fire({
+						title: "Error!",
+						text: `File "${file.name}" is too large. Max size is 1MB.`,
+						icon: "error",
+					});
+				}
+				if (err.code === "file-invalid-type") {
+					Swal.fire({
+						title: "Error!",
+						text: `File "${file.name}" is not an accepted format.`,
+						icon: "error",
+					});
+				}
+				if (err.code === "too-many-files") {
+					Swal.fire({
+						title: "Error!",
+						text: `You can only upload up to 10 files.`,
+						icon: "error",
+					});
+				}
+			});
+		});
+	}, []);
+
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
+		onDropRejected,
 		maxFiles: 10, // max 10 files
 		maxSize: 1 * 1024 * 1024, // 1 MB
 		accept: {
@@ -48,7 +76,7 @@ const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
 
 	return (
 		<>
-			<Controller				
+			<Controller
 				control={control}
 				name="files"
 				render={() => (
@@ -57,62 +85,57 @@ const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
 						sx={{
 							textAlign: "center",
 							bgcolor: isDragActive ? "action.hover" : "background.paper",
-              border: "1px dashed",
+							border: "1px dashed",
 							borderColor: isDragActive ? "primary.main" : "grey.400",
 							borderRadius: 2,
 							cursor: "pointer",
 							transition: "0.2s",
-              boxShadow: "none",
+							boxShadow: "none",
 							paddingX: { xs: 5, md: 10 },
-              paddingY: 10,
+							paddingY: 10,
 						}}>
 						<input id={id} {...getInputProps()} />
 						<Typography variant="body1" color={theme.palette.text.disabled}>
-              {isDragActive ? "Drop the files here..." : "Drag & drop files here, or click to select (max 10 files, 2 MB each)"}
-            </Typography>
+							{isDragActive ? "Drop the files here..." : "Drag & drop files here, or click to select (max 10 files, 1 MB each)"}
+						</Typography>
 					</Paper>
 				)}
-      />
+			/>
 
 			{/* Preview thumbnails */}
 			{files && files.length > 0 && (
-				<Box 
-          sx={{
-            display: "grid", gap: 2,
-            gridTemplateColumns: {
-              xs: '1fr',
-              sm: 'repeat(auto-fill, minmax(150px, 1fr))',
-            },
-            marginTop: 2,
-          }}
-        >
+				<Box
+					sx={{
+						display: "grid",
+						gap: 2,
+						gridTemplateColumns: {
+							xs: "1fr",
+							sm: "repeat(auto-fill, minmax(150px, 1fr))",
+						},
+						marginTop: 2,
+					}}>
 					{files.map((file: any, i: any) => (
-						<Box 
-              key={i} 
-              sx={{ 
-                position: "relative", 
-                width: "100%", 
-                maxHeight: 150,
-                border: "1px solid #CCCCCC",  
-                borderRadius: 2, 
-                overflow: "hidden" 
-              }}
-            >
+						<Box
+							key={i}
+							sx={{
+								position: "relative",
+								width: "100%",
+								maxHeight: 150,
+								border: "1px solid #CCCCCC",
+								borderRadius: 2,
+								overflow: "hidden",
+							}}>
 							{file.type.startsWith("image/") ? (
-								<img 
-                  src={URL.createObjectURL(file)} alt={file.name} 
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }} 
-                />
+								<img src={URL.createObjectURL(file)} alt={file.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
 							) : (
-								<Box 
-                  sx={{ 
-                    height: "100%", 
-                    display: "flex", 
-                    alignItems: "center", 
-                    justifyContent: "center",
-                    padding: 1, 
-                  }}
-                >
+								<Box
+									sx={{
+										height: "100%",
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										padding: 1,
+									}}>
 									<Typography variant="caption">{file.name}</Typography>
 								</Box>
 							)}
@@ -122,9 +145,9 @@ const InputFile = ({ id, control, watch, setValue }: InputFileProps) => {
 								size="small"
 								onClick={() => removeFile(file.name)}
 								sx={{
-                  position: "absolute",
-									top: 3, 
-                  right: 3,
+									position: "absolute",
+									top: 3,
+									right: 3,
 									bgcolor: "rgba(255,255,255,0.8)",
 									"&:hover": { bgcolor: "error.main", color: "white" },
 								}}>
